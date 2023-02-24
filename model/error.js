@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-module.exports = (mongoose, mongoosePaginate) => {
+module.exports = (mongoose) => {
   var error = mongoose.Schema(
     {
       company_code: {
@@ -58,7 +58,6 @@ module.exports = (mongoose, mongoosePaginate) => {
   //   object.id = _id;
   //   return object;
   // });
-
   // error.plugin(mongoosePaginate);
 
   const Error = mongoose.model("Error", error);
