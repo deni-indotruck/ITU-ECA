@@ -1,12 +1,8 @@
 const mongoose = require("mongoose");
-const mongoosePaginate = require("mongoose-paginate-v2");
 
 module.exports = (mongoose, mongoosePaginate) => {
   var error = mongoose.Schema(
     {
-      _id: {
-        type: mongoose.Schema.Types.ObjectId,
-      },
       company_code: {
         type: String,
       },
@@ -63,7 +59,7 @@ module.exports = (mongoose, mongoosePaginate) => {
   //   return object;
   // });
 
-  error.plugin(mongoosePaginate);
+  // error.plugin(mongoosePaginate);
 
   const Error = mongoose.model("Error", error);
   return Error;
