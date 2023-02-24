@@ -2,13 +2,20 @@ const express = require("express");
 const https = require("https");
 const fs = require("fs");
 const path = require("path");
+require("dotenv").config();
+require("./config/db");
+const importAlert = require("./config/importAlert");
+const importError = require("./config/importError");
 const app = express();
 app.use(express.json());
+
 app.use(express.urlencoded({ extended: true }));
 
 app.get("/", (req, res) => {
   res.json({ message: "Welcome to ITU-ECA" });
 });
+
+app.use([importAlert, importError]);
 
 const privateKey = fs.readFileSync(
   path.join(__dirname, "/keys/private.key"),
