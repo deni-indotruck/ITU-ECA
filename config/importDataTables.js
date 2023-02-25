@@ -1,52 +1,42 @@
 const excelToJson = require("convert-excel-to-json");
-const User = require("./models/user.model");
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcryptjs");
-app.get("/checkUsers", async (req, res) => {
+const DataTable = require("../models/datatable");
+const express = require("express");
+const app = express.Router();
+
+app.get("/importDatatable", async (req, res) => {
   const result = excelToJson({
-    sourceFile: "users.xlsx",
+    sourceFile: "Datatable.xlsx",
     header: {
-      rows: 1,
+      rows: 5,
     },
     columnToKey: {
-      "*": "{{columnHeader}}",
+      A: "machine",
+      B: "chassis_id",
+      C: "total_machine_hour",
+      D: "location",
+      E: "last_update_selected_date",
+      F: "fuel_level",
+      G: "customer",
     },
   });
   const bulk = [];
-  for (const dataToInsert of result.users) {
-    const password = await bcrypt.hash(`${dataToInsert.phone}`, 12);
-    const token = jwt.sign(
-      {
-        email: dataToInsert.email,
-      },
-      process.env.SECRET_KEY,
-      {
-        expiresIn: "30 days",
-      }
-    );
+  for (const dataToInsert of result.status_report) {
     bulk.push({
-      updateOne: {
-        filter: { email: dataToInsert.email },
-        update: {
-          $setOnInsert: {
-            email: dataToInsert.email,
-            password: password,
-            firstname: dataToInsert.firstname,
-            middlename:
-              dataToInsert.middlename == null ? "" : dataToInsert.middlename,
-            lastname:
-              dataToInsert.lastname == null ? "" : dataToInsert.lastname,
-            mechanic_id: dataToInsert.mechanic_id,
-            token: token,
-            branch: dataToInsert.branch,
-            role: dataToInsert.role,
-            phone: dataToInsert.phone,
-          },
+      insertOne: {
+        document: {
+          machine: dataToInsert.machine,
+          chassis_id: dataToInsert.chassis_id,
+          total_machine_hour: dataToInsert.total_machine_hour,
+          location: dataToInsert.location,
+          last_update_selected_date: dataToInsert.last_update_selected_date,
+          fuel_level: dataToInsert.fuel_level,
+          customer: dataToInsert.customer,
         },
-        upsert: true,
       },
     });
   }
-  if (bulk.length > 0) await User.bulkWrite(bulk);
+  if (bulk.length > 0) await DataTable.bulkWrite(bulk);
   res.json(bulk);
 });
+
+module.exports = app;
