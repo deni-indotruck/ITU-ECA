@@ -1,22 +1,40 @@
 const express = require("express");
 const AlertModel = require("../models/alert");
 const ErrorModel = require("../models/error");
+const AndroidModel = require("../models/android");
+const IphoneModel = require("../models/iphone");
+const EquipmentModel = require("../models/equipment");
 const DatatableModel = require("../models/datatable");
 const { application } = require("express");
 const app = express.Router();
+const bodyParser = require("body-parser");
+
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }));
+
+// parse application/json
+app.use(bodyParser.json());
 
 app.get("/api/datatable", async (req, res) => {
+
   const apiKey = req.get("apiKey");
   if (apiKey != process.env.API_KEY) {
     return res.status(401).json({
       message: "Anauthorized",
     });
   }
+
+  var page = req.query.page;
+  var per_page = req.query.limit || 10;
+
   const year = req.query.year;
   const month = req.query.month;
   try {
     if (!year && !month) {
-      const datatable = await DatatableModel.find();
+      const totalDatatable = await DatatableModel.estimatedDocumentCount();
+      const datatable = await DatatableModel.find()
+        .skip((page - 1) * per_page)
+        .limit(per_page);
 
       const result = datatable.map((v) => {
         const [company, ...rest] = v.machine.split(" ");
@@ -26,13 +44,22 @@ app.get("/api/datatable", async (req, res) => {
           total_machine_hour: v.total_machine_hour,
         };
       });
-      res.status(200).json(result);
+      res
+        .status(200)
+        .json({ totalData: totalDatatable, currentPage: page, data: result });
     } else if (year && !month) {
+      const totalDatatable = await DatatableModel.find({
+        $expr: {
+          $eq: [{ $year: "$last_update_selected_date" }, year],
+        },
+      }).countDocuments();
       const datatable = await DatatableModel.find({
         $expr: {
           $eq: [{ $year: "$last_update_selected_date" }, year],
         },
-      });
+      })
+        .skip((page - 1) * per_page)
+        .limit(per_page);
 
       const result = datatable.map((v) => {
         const [company, ...rest] = v.machine.split(" ");
@@ -42,13 +69,22 @@ app.get("/api/datatable", async (req, res) => {
           total_machine_hour: v.total_machine_hour,
         };
       });
-      res.status(200).json(result);
+      res
+        .status(200)
+        .json({ totalData: totalDatatable, currentPage: page, data: result });
     } else if (month && !year) {
+      const totalDatatable = await DatatableModel.find({
+        $expr: {
+          $eq: [{ $month: "$last_update_selected_date" }, month],
+        },
+      }).countDocuments();
       const datatable = await DatatableModel.find({
         $expr: {
           $eq: [{ $month: "$last_update_selected_date" }, month],
         },
-      });
+      })
+        .skip((page - 1) * per_page)
+        .limit(per_page);
 
       const result = datatable.map((v) => {
         const [company, ...rest] = v.machine.split(" ");
@@ -58,8 +94,24 @@ app.get("/api/datatable", async (req, res) => {
           total_machine_hour: v.total_machine_hour,
         };
       });
-      res.status(200).json(result);
+      res
+        .status(200)
+        .json({ totalData: totalDatatable, currentPage: page, data: result });
     } else if (year && month) {
+      const totalDatatable = await DatatableModel.find({
+        $and: [
+          {
+            $expr: {
+              $eq: [{ $year: "$last_update_selected_date" }, year],
+            },
+          },
+          {
+            $expr: {
+              $eq: [{ $month: "$last_update_selected_date" }, month],
+            },
+          },
+        ],
+      }).countDocuments();
       const datatable = await DatatableModel.find({
         $and: [
           {
@@ -73,7 +125,9 @@ app.get("/api/datatable", async (req, res) => {
             },
           },
         ],
-      });
+      })
+        .skip((page - 1) * per_page)
+        .limit(per_page);
 
       const result = datatable.map((v) => {
         const [company, ...rest] = v.machine.split(" ");
@@ -83,7 +137,9 @@ app.get("/api/datatable", async (req, res) => {
           total_machine_hour: v.total_machine_hour,
         };
       });
-      res.status(200).json(result);
+      res
+        .status(200)
+        .json({ totalData: totalDatatable, currentPage: page, data: result });
     }
   } catch (error) {
     res
@@ -93,16 +149,26 @@ app.get("/api/datatable", async (req, res) => {
 });
 
 app.get("/api/alert", async (req, res) => {
+
   const apiKey = req.get("apiKey");
   if (apiKey != process.env.API_KEY) {
     return res.status(401).json({
       message: "Anauthorized",
     });
   }
-  try {
-    const alert = await AlertModel.find();
 
-    res.status(200).json(alert);
+  var page = req.query.page;
+  var per_page = req.query.limit || 10;
+
+  try {
+    const totalAlert = await AlertModel.estimatedDocumentCount();
+    const alert = await AlertModel.find()
+      .skip((page - 1) * per_page)
+      .limit(per_page);
+
+    res
+      .status(200)
+      .json({ totalData: totalAlert, currentPage: page, data: alert });
   } catch (error) {
     res
       .status(500)
@@ -111,16 +177,25 @@ app.get("/api/alert", async (req, res) => {
 });
 
 app.get("/api/error", async (req, res) => {
+
   const apiKey = req.get("apiKey");
   if (apiKey != process.env.API_KEY) {
     return res.status(401).json({
       message: "Anauthorized",
     });
   }
-  try {
-    const error = await ErrorModel.find();
 
-    res.status(200).json(error);
+  var page = req.query.page;
+  var per_page = req.query.limit || 10;
+
+  try {
+    const totalError = await ErrorModel.estimatedDocumentCount();
+    const error = await ErrorModel.find()
+      .skip((page - 1) * per_page)
+      .limit(per_page);
+    res
+      .status(200)
+      .json({ totalData: totalError, currentPage: page, data: error });
   } catch (error) {
     res
       .status(500)
@@ -568,6 +643,7 @@ app.get("/api/dashboard", async (req, res) => {
       const errorPriority3 = await ErrorModel.countDocuments({
         priority: "3",
       });
+
       res.status(200).json({
         total_error: errorCount,
         total_alert: alertCount,
@@ -578,6 +654,10 @@ app.get("/api/dashboard", async (req, res) => {
         error_priority_1: errorPriority1,
         error_priority_2: errorPriority2,
         error_priority_3: errorPriority3,
+        visitor: "0",
+        android: "0",
+        iphone: "0",
+        equipment: "0",
       });
     } else if (year && !month) {
       const errorCount = await ErrorModel.find({
@@ -684,6 +764,10 @@ app.get("/api/dashboard", async (req, res) => {
         error_priority_1: errorPriority1,
         error_priority_2: errorPriority2,
         error_priority_3: errorPriority3,
+        visitor: "0",
+        android: "0",
+        iphone: "0",
+        equipment: "0",
       });
     } else if (!year && month) {
       const errorCount = await ErrorModel.find({
@@ -790,6 +874,10 @@ app.get("/api/dashboard", async (req, res) => {
         error_priority_1: errorPriority1,
         error_priority_2: errorPriority2,
         error_priority_3: errorPriority3,
+        visitor: "0",
+        android: "0",
+        iphone: "0",
+        equipment: "0",
       });
     } else if (year && month) {
       const errorCount = await ErrorModel.find({
@@ -971,6 +1059,10 @@ app.get("/api/dashboard", async (req, res) => {
         error_priority_1: errorPriority1,
         error_priority_2: errorPriority2,
         error_priority_3: errorPriority3,
+        visitor: "0",
+        android: "0",
+        iphone: "0",
+        equipment: "0",
       });
     }
   } catch (error) {
@@ -994,5 +1086,29 @@ app.get("/api/dashboard2", async (req, res) => {
     },
   });
   res.json(errorCount);
+});
+
+app.post("/api/android", async (req, res) => {
+  try {
+    var update_download_android = req.query.update_download_android;
+
+    var last_data_downloads = await AndroidModel.find().select("downloads");
+
+    const android = new AndroidModel({
+      download: update_download_android,
+      last_data_downloads: last_data_downloads,
+    });
+
+    console.log({
+      update_download_android: update_download_android,
+      last_data_downloads: last_data_downloads,
+    });
+
+    // const execAndroid = await AndroidModel.save(android).exec();
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "internal server error", error: error.toString() });
+  }
 });
 module.exports = app;
