@@ -2,25 +2,27 @@ const express = require("express");
 const https = require("https");
 const fs = require("fs");
 const path = require("path");
+const actuator = require("express-actuator");
 require("dotenv").config();
 require("./config/db");
 const importAlert = require("./config/importAlert");
 const importError = require("./config/importError");
-
 const importDatatable = require("./config/importDataTables");
 const route = require("./routes/index");
+const morgan = require("morgan");
+const { options, morganOptions } = require("./config/index");
 
 const app = express();
 app.use(express.json());
-
 app.use(express.urlencoded({ extended: true }));
+app.use(actuator(options));
+app.use(morgan(morganOptions));
 
 app.get("/", (req, res) => {
   res.json({ message: "Welcome to ITU-ECA" });
 });
 
 app.use([importAlert, importError, importDatatable, route]);
-
 
 const privateKey = fs.readFileSync(
   path.join(__dirname, "/keys/private.key"),
