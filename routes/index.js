@@ -13,7 +13,8 @@ app.use(bodyParser.json());
 
 app.get("/api/datatable", async (req, res) => {
   var page = req.query.page;
-  var per_page = 10;
+  var per_page = req.query.limit || 10;
+  console.log(per_page);
   const totalDatatable = await DatatableModel.estimatedDocumentCount();
   const datatable = await DatatableModel.find()
     .skip((page - 1) * per_page)
@@ -34,7 +35,7 @@ app.get("/api/datatable", async (req, res) => {
 
 app.get("/api/alert", async (req, res) => {
   var page = req.query.page;
-  var per_page = 10;
+  var per_page = req.query.limit || 10;
   try {
     const totalAlert = await AlertModel.estimatedDocumentCount();
     const alert = await AlertModel.find()
@@ -114,7 +115,7 @@ app.get("/api/alert", async (req, res) => {
 
 app.get("/api/error", async (req, res) => {
   var page = req.query.page;
-  var per_page = 10;
+  var per_page = req.query.limit || 10;
   try {
     const totalError = await ErrorModel.estimatedDocumentCount();
     const error = await ErrorModel.find()
