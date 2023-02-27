@@ -6,15 +6,21 @@ require("dotenv").config();
 require("./config/db");
 const importAlert = require("./config/importAlert");
 const importError = require("./config/importError");
+
+const importDatatable = require("./config/importDataTables");
+const route = require("./routes/index");
+
 const app = express();
 app.use(express.json());
+
 app.use(express.urlencoded({ extended: true }));
 
 app.get("/", (req, res) => {
   res.json({ message: "Welcome to ITU-ECA" });
 });
 
-app.use([importAlert, importError]);
+app.use([importAlert, importError, importDatatable, route]);
+
 
 const privateKey = fs.readFileSync(
   path.join(__dirname, "/keys/private.key"),
