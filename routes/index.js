@@ -4,6 +4,13 @@ const ErrorModel = require("../models/error");
 const DatatableModel = require("../models/datatable");
 const { application } = require("express");
 const app = express.Router();
+const bodyParser = require("body-parser");
+
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }));
+
+// parse application/json
+app.use(bodyParser.json());
 
 app.get("/api/datatable", async (req, res) => {
   const year = req.query.year;
