@@ -42,7 +42,7 @@ https
     app
   )
   .listen(5050, () =>
-    console.log("HTTPS Server are created and started at port 5001")
+    console.log("HTTPS Server are created and started at port 5050")
   );
 
 app.listen(process.env.PORT || 5051, function () {
