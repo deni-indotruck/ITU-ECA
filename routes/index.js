@@ -1,6 +1,9 @@
 const express = require("express");
 const AlertModel = require("../models/alert");
 const ErrorModel = require("../models/error");
+const AndroidModel = require("../models/android");
+const IphoneModel = require("../models/iphone");
+const EquipmentModel = require("../models/equipment");
 const DatatableModel = require("../models/datatable");
 const { application } = require("express");
 const app = express.Router();
@@ -589,6 +592,7 @@ app.get("/api/dashboard", async (req, res) => {
       const errorPriority3 = await ErrorModel.countDocuments({
         priority: "3",
       });
+
       res.status(200).json({
         total_error: errorCount,
         total_alert: alertCount,
@@ -599,6 +603,10 @@ app.get("/api/dashboard", async (req, res) => {
         error_priority_1: errorPriority1,
         error_priority_2: errorPriority2,
         error_priority_3: errorPriority3,
+        visitor: "0",
+        android: "0",
+        iphone: "0",
+        equipment: "0",
       });
     } else if (year && !month) {
       const errorCount = await ErrorModel.find({
@@ -705,6 +713,10 @@ app.get("/api/dashboard", async (req, res) => {
         error_priority_1: errorPriority1,
         error_priority_2: errorPriority2,
         error_priority_3: errorPriority3,
+        visitor: "0",
+        android: "0",
+        iphone: "0",
+        equipment: "0",
       });
     } else if (!year && month) {
       const errorCount = await ErrorModel.find({
@@ -811,6 +823,10 @@ app.get("/api/dashboard", async (req, res) => {
         error_priority_1: errorPriority1,
         error_priority_2: errorPriority2,
         error_priority_3: errorPriority3,
+        visitor: "0",
+        android: "0",
+        iphone: "0",
+        equipment: "0",
       });
     } else if (year && month) {
       const errorCount = await ErrorModel.find({
@@ -992,6 +1008,10 @@ app.get("/api/dashboard", async (req, res) => {
         error_priority_1: errorPriority1,
         error_priority_2: errorPriority2,
         error_priority_3: errorPriority3,
+        visitor: "0",
+        android: "0",
+        iphone: "0",
+        equipment: "0",
       });
     }
   } catch (error) {
@@ -1009,5 +1029,29 @@ app.get("/api/dashboard2", async (req, res) => {
     },
   });
   res.json(errorCount);
+});
+
+app.post("/api/android", async (req, res) => {
+  try {
+    var update_download_android = req.query.update_download_android;
+
+    var last_data_downloads = await AndroidModel.find().select("downloads");
+
+    const android = new AndroidModel({
+      download: update_download_android,
+      last_data_downloads: last_data_downloads,
+    });
+
+    console.log({
+      update_download_android: update_download_android,
+      last_data_downloads: last_data_downloads,
+    });
+
+    // const execAndroid = await AndroidModel.save(android).exec();
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "internal server error", error: error.toString() });
+  }
 });
 module.exports = app;
