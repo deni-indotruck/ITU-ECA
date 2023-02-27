@@ -6,6 +6,12 @@ const { application } = require("express");
 const app = express.Router();
 
 app.get("/api/datatable", async (req, res) => {
+  const apiKey = req.get("apiKey");
+  if (apiKey != process.env.API_KEY) {
+    return res.status(401).json({
+      message: "Anauthorized",
+    });
+  }
   const year = req.query.year;
   const month = req.query.month;
   try {
@@ -87,6 +93,12 @@ app.get("/api/datatable", async (req, res) => {
 });
 
 app.get("/api/alert", async (req, res) => {
+  const apiKey = req.get("apiKey");
+  if (apiKey != process.env.API_KEY) {
+    return res.status(401).json({
+      message: "Anauthorized",
+    });
+  }
   try {
     const alert = await AlertModel.find();
 
@@ -99,6 +111,12 @@ app.get("/api/alert", async (req, res) => {
 });
 
 app.get("/api/error", async (req, res) => {
+  const apiKey = req.get("apiKey");
+  if (apiKey != process.env.API_KEY) {
+    return res.status(401).json({
+      message: "Anauthorized",
+    });
+  }
   try {
     const error = await ErrorModel.find();
 
@@ -111,6 +129,12 @@ app.get("/api/error", async (req, res) => {
 });
 
 app.get("/api/top10error", async (req, res) => {
+  const apiKey = req.get("apiKey");
+  if (apiKey != process.env.API_KEY) {
+    return res.status(401).json({
+      message: "Anauthorized",
+    });
+  }
   const year = parseInt(req.query.year);
   const month = parseInt(req.query.month);
   try {
@@ -229,6 +253,12 @@ app.get("/api/top10error", async (req, res) => {
 });
 
 app.get("/api/top10alert", async (req, res) => {
+  const apiKey = req.get("apiKey");
+  if (apiKey != process.env.API_KEY) {
+    return res.status(401).json({
+      message: "Anauthorized",
+    });
+  }
   const year = parseInt(req.query.year);
   const month = parseInt(req.query.month);
   try {
@@ -351,6 +381,12 @@ app.get("/api/top10alert", async (req, res) => {
 });
 
 app.get("/api/top10errorbymachine", async (req, res) => {
+  const apiKey = req.get("apiKey");
+  if (apiKey != process.env.API_KEY) {
+    return res.status(401).json({
+      message: "Anauthorized",
+    });
+  }
   const year = parseInt(req.query.year);
   const month = parseInt(req.query.month);
   try {
@@ -500,6 +536,12 @@ app.get("/api/top10errorbymachine", async (req, res) => {
 });
 
 app.get("/api/dashboard", async (req, res) => {
+  const apiKey = req.get("apiKey");
+  if (apiKey != process.env.API_KEY) {
+    return res.status(401).json({
+      message: "Anauthorized",
+    });
+  }
   try {
     const year = req.query.year;
     const month = req.query.month;
@@ -939,6 +981,12 @@ app.get("/api/dashboard", async (req, res) => {
 });
 
 app.get("/api/dashboard2", async (req, res) => {
+  const apiKey = req.get("apiKey");
+  if (apiKey != process.env.API_KEY) {
+    return res.status(401).json({
+      message: "Anauthorized",
+    });
+  }
   const yearToFind = 4;
   const errorCount = await ErrorModel.find({
     $expr: {

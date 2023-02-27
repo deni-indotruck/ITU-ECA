@@ -9,18 +9,14 @@ const importAlert = require("./config/importAlert");
 const importError = require("./config/importError");
 const importDatatable = require("./config/importDataTables");
 const route = require("./routes/index");
-const options = {
-  basePath: "/api", // It will set /management/info instead of /info
-  infoGitMode: "full", // the amount of git information you want to expose, 'simple' or 'full',
-  infoBuildOptions: null, // extra information you want to expose in the build object. Requires an object.
-  infoDateFormat: null, // by default, git.commit.time will show as is defined in git.properties. If infoDateFormat is defined, moment will format git.commit.time. See https://momentjs.com/docs/#/displaying/format/.
-  customEndpoints: [], // array of custom endpoints
-};
+const morgan = require("morgan");
+const { options, morganOptions } = require("./config/index");
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(actuator(options));
+app.use(morgan(morganOptions));
 
 app.get("/", (req, res) => {
   res.json({ message: "Welcome to ITU-ECA" });
