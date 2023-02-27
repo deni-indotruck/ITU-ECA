@@ -13,11 +13,16 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 app.get("/api/datatable", async (req, res) => {
+  var page = req.query.page;
+  var per_page = req.query.limit || 10;
   const year = req.query.year;
   const month = req.query.month;
   try {
     if (!year && !month) {
-      const datatable = await DatatableModel.find();
+      const totalDatatable = await DatatableModel.estimatedDocumentCount();
+      const datatable = await DatatableModel.find()
+        .skip((page - 1) * per_page)
+        .limit(per_page);
 
       const result = datatable.map((v) => {
         const [company, ...rest] = v.machine.split(" ");
@@ -27,13 +32,22 @@ app.get("/api/datatable", async (req, res) => {
           total_machine_hour: v.total_machine_hour,
         };
       });
-      res.status(200).json(result);
+      res
+        .status(200)
+        .json({ totalData: totalDatatable, currentPage: page, data: result });
     } else if (year && !month) {
+      const totalDatatable = await DatatableModel.find({
+        $expr: {
+          $eq: [{ $year: "$last_update_selected_date" }, year],
+        },
+      }).countDocuments();
       const datatable = await DatatableModel.find({
         $expr: {
           $eq: [{ $year: "$last_update_selected_date" }, year],
         },
-      });
+      })
+        .skip((page - 1) * per_page)
+        .limit(per_page);
 
       const result = datatable.map((v) => {
         const [company, ...rest] = v.machine.split(" ");
@@ -43,13 +57,22 @@ app.get("/api/datatable", async (req, res) => {
           total_machine_hour: v.total_machine_hour,
         };
       });
-      res.status(200).json(result);
+      res
+        .status(200)
+        .json({ totalData: totalDatatable, currentPage: page, data: result });
     } else if (month && !year) {
+      const totalDatatable = await DatatableModel.find({
+        $expr: {
+          $eq: [{ $month: "$last_update_selected_date" }, month],
+        },
+      }).countDocuments();
       const datatable = await DatatableModel.find({
         $expr: {
           $eq: [{ $month: "$last_update_selected_date" }, month],
         },
-      });
+      })
+        .skip((page - 1) * per_page)
+        .limit(per_page);
 
       const result = datatable.map((v) => {
         const [company, ...rest] = v.machine.split(" ");
@@ -59,8 +82,24 @@ app.get("/api/datatable", async (req, res) => {
           total_machine_hour: v.total_machine_hour,
         };
       });
-      res.status(200).json(result);
+      res
+        .status(200)
+        .json({ totalData: totalDatatable, currentPage: page, data: result });
     } else if (year && month) {
+      const totalDatatable = await DatatableModel.find({
+        $and: [
+          {
+            $expr: {
+              $eq: [{ $year: "$last_update_selected_date" }, year],
+            },
+          },
+          {
+            $expr: {
+              $eq: [{ $month: "$last_update_selected_date" }, month],
+            },
+          },
+        ],
+      }).countDocuments();
       const datatable = await DatatableModel.find({
         $and: [
           {
@@ -74,7 +113,9 @@ app.get("/api/datatable", async (req, res) => {
             },
           },
         ],
-      });
+      })
+        .skip((page - 1) * per_page)
+        .limit(per_page);
 
       const result = datatable.map((v) => {
         const [company, ...rest] = v.machine.split(" ");
@@ -84,7 +125,9 @@ app.get("/api/datatable", async (req, res) => {
           total_machine_hour: v.total_machine_hour,
         };
       });
-      res.status(200).json(result);
+      res
+        .status(200)
+        .json({ totalData: totalDatatable, currentPage: page, data: result });
     }
   } catch (error) {
     res
@@ -94,10 +137,17 @@ app.get("/api/datatable", async (req, res) => {
 });
 
 app.get("/api/alert", async (req, res) => {
+  var page = req.query.page;
+  var per_page = req.query.limit || 10;
   try {
-    const alert = await AlertModel.find();
+    const totalAlert = await AlertModel.estimatedDocumentCount();
+    const alert = await AlertModel.find()
+      .skip((page - 1) * per_page)
+      .limit(per_page);
 
-    res.status(200).json(alert);
+    res
+      .status(200)
+      .json({ totalData: totalAlert, currentPage: page, data: alert });
   } catch (error) {
     res
       .status(500)
@@ -106,10 +156,16 @@ app.get("/api/alert", async (req, res) => {
 });
 
 app.get("/api/error", async (req, res) => {
+  var page = req.query.page;
+  var per_page = req.query.limit || 10;
   try {
-    const error = await ErrorModel.find();
-
-    res.status(200).json(error);
+    const totalError = await ErrorModel.estimatedDocumentCount();
+    const error = await ErrorModel.find()
+      .skip((page - 1) * per_page)
+      .limit(per_page);
+    res
+      .status(200)
+      .json({ totalData: totalError, currentPage: page, data: error });
   } catch (error) {
     res
       .status(500)
