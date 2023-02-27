@@ -3,9 +3,20 @@ const AlertModel = require("../models/alert");
 const ErrorModel = require("../models/error");
 const DatatableModel = require("../models/datatable");
 const app = express.Router();
+const bodyParser = require("body-parser");
+
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }));
+
+// parse application/json
+app.use(bodyParser.json());
 
 app.get("/api/datatable", async (req, res) => {
-  const datatable = await DatatableModel.find();
+  var page = req.query.page;
+  var per_page = 10;
+  const datatable = await DatatableModel.find()
+    .skip((page - 1) * per_page)
+    .limit(per_page);
 
   const result = datatable.map((v) => {
     const [company, ...rest] = v.machine.split(" ");
@@ -19,14 +30,88 @@ app.get("/api/datatable", async (req, res) => {
 });
 
 app.get("/api/alert", async (req, res) => {
-  const alert = await AlertModel.find();
+  var page = req.query.page;
+  var per_page = 10;
+  try {
+    const alert = await AlertModel.find()
+      .skip((page - 1) * per_page)
+      .limit(per_page);
 
-  res.status(200).json(alert);
+    res.status(200).json(alert);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "internal server error", error: error.toString() });
+  }
 });
 
-app.get("/api/error", async (req, res) => {
-  const error = await ErrorModel.find();
+// app.get("/api/alert", async (req, res) => {
+//   var year = req.query.year;
+//   var month = req.query.month;
+//   var page = req.query.page;
+//   var per_page = 10;
 
+//   if (year != "") {
+//     var yearNow = new Date(year);
+//     var oneYearFromNow = new Date(year);
+//     oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1);
+//     if (month != "") {
+//       yearNow.setMonth(month - 1);
+//       var oneMonthFromNow = new Date(year);
+//       oneMonthFromNow.setMonth(month);
+//       const alert = await AlertModel.find({
+//         date: { $gt: yearNow, $lt: oneMonthFromNow },
+//       })
+//         .skip((page - 1) * per_page)
+//         .limit(page * per_page);
+//       const totalAlertFiltered = await AlertModel.countDocuments({
+//         date: { $gt: yearNow, $lt: oneMonthFromNow },
+//       });
+
+//       res.status(200).json({
+//         min: yearNow,
+//         max: oneMonthFromNow,
+//         totalData: totalAlertFiltered,
+//         data: alert,
+//       });
+//     } else {
+//       const alert = await AlertModel.find({
+//         date: { $gt: yearNow, $lt: oneYearFromNow },
+//       })
+//         .skip((page - 1) * per_page)
+//         .limit(page * per_page);
+//       const totalAlertFiltered = await AlertModel.countDocuments({
+//         date: { $gt: yearNow, $lt: oneYearFromNow },
+//       });
+
+//       res.status(200).json({
+//         min: yearNow,
+//         max: oneYearFromNow,
+//         totalData: totalAlertFiltered,
+//         data: alert,
+//       });
+//     }
+//   } else {
+//     const alert = await AlertModel.find()
+//       .skip((page - 1) * per_page)
+//       .limit(page * per_page);
+//     const totalAlertFiltered = await AlertModel.countDocuments();
+
+//     res.status(200).json({
+//       min: "kosong",
+//       max: "kosong",
+//       totalData: totalAlertFiltered,
+//       data: alert,
+//     });
+//   }
+// });
+
+app.get("/api/error", async (req, res) => {
+  var page = req.query.page;
+  var per_page = 10;
+  const error = await ErrorModel.find()
+    .skip((page - 1) * per_page)
+    .limit(per_page);
   res.status(200).json(error);
 });
 
