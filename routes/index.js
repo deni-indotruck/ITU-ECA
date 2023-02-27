@@ -27,7 +27,9 @@ app.get("/api/datatable", async (req, res) => {
       total_machine_hour: v.total_machine_hour,
     };
   });
-  res.status(200).json({ totalData: totalDatatable, data: result });
+  res
+    .status(200)
+    .json({ totalData: totalDatatable, currentPage: page, data: result });
 });
 
 app.get("/api/alert", async (req, res) => {
@@ -39,7 +41,9 @@ app.get("/api/alert", async (req, res) => {
       .skip((page - 1) * per_page)
       .limit(per_page);
 
-    res.status(200).json({ totalData: totalAlert, data: alert });
+    res
+      .status(200)
+      .json({ totalData: totalAlert, currentPage: page, data: alert });
   } catch (error) {
     res
       .status(500)
@@ -116,7 +120,9 @@ app.get("/api/error", async (req, res) => {
     const error = await ErrorModel.find()
       .skip((page - 1) * per_page)
       .limit(per_page);
-    res.status(200).json({ totalData: totalError, data: error });
+    res
+      .status(200)
+      .json({ totalData: totalError, currentPage: page, data: error });
   } catch (error) {
     res
       .status(500)
