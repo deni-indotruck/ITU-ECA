@@ -45,7 +45,9 @@ app.get("/api/datatable", async (req, res) => {
         $expr: {
           $eq: [{ $year: "$last_update_selected_date" }, year],
         },
-      });
+      })
+        .skip((page - 1) * per_page)
+        .limit(per_page);
 
       const result = datatable.map((v) => {
         const [company, ...rest] = v.machine.split(" ");
@@ -68,7 +70,9 @@ app.get("/api/datatable", async (req, res) => {
         $expr: {
           $eq: [{ $month: "$last_update_selected_date" }, month],
         },
-      });
+      })
+        .skip((page - 1) * per_page)
+        .limit(per_page);
 
       const result = datatable.map((v) => {
         const [company, ...rest] = v.machine.split(" ");
@@ -109,7 +113,9 @@ app.get("/api/datatable", async (req, res) => {
             },
           },
         ],
-      });
+      })
+        .skip((page - 1) * per_page)
+        .limit(per_page);
 
       const result = datatable.map((v) => {
         const [company, ...rest] = v.machine.split(" ");
