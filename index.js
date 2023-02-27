@@ -3,6 +3,7 @@ const https = require("https");
 const fs = require("fs");
 const path = require("path");
 const actuator = require("express-actuator");
+const cors = require("cors");
 require("dotenv").config();
 require("./config/db");
 const importAlert = require("./config/importAlert");
@@ -17,6 +18,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(actuator(options));
 app.use(morgan(morganOptions));
+app.use(cors());
 
 app.get("/", (req, res) => {
   res.json({ message: "Welcome to ITU-ECA" });
