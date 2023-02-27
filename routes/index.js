@@ -14,6 +14,7 @@ app.use(bodyParser.json());
 app.get("/api/datatable", async (req, res) => {
   var page = req.query.page;
   var per_page = 10;
+  const totalDatatable = await DatatableModel.estimatedDocumentCount();
   const datatable = await DatatableModel.find()
     .skip((page - 1) * per_page)
     .limit(per_page);
@@ -26,18 +27,19 @@ app.get("/api/datatable", async (req, res) => {
       total_machine_hour: v.total_machine_hour,
     };
   });
-  res.status(200).json(result);
+  res.status(200).json({ totalData: totalDatatable, data: result });
 });
 
 app.get("/api/alert", async (req, res) => {
   var page = req.query.page;
   var per_page = 10;
   try {
+    const totalAlert = await AlertModel.estimatedDocumentCount();
     const alert = await AlertModel.find()
       .skip((page - 1) * per_page)
       .limit(per_page);
 
-    res.status(200).json(alert);
+    res.status(200).json({ totalData: totalAlert, data: alert });
   } catch (error) {
     res
       .status(500)
@@ -109,10 +111,17 @@ app.get("/api/alert", async (req, res) => {
 app.get("/api/error", async (req, res) => {
   var page = req.query.page;
   var per_page = 10;
-  const error = await ErrorModel.find()
-    .skip((page - 1) * per_page)
-    .limit(per_page);
-  res.status(200).json(error);
+  try {
+    const totalError = await ErrorModel.estimatedDocumentCount();
+    const error = await ErrorModel.find()
+      .skip((page - 1) * per_page)
+      .limit(per_page);
+    res.status(200).json({ totalData: totalError, data: error });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "internal server error", error: error.toString() });
+  }
 });
 
 app.get("/api/top10error", async (req, res) => {
