@@ -6,8 +6,10 @@ require("dotenv").config();
 require("./config/db");
 const importAlert = require("./config/importAlert");
 const importError = require("./config/importError");
+
 const importDatatable = require("./config/importDataTables");
 const route = require("./routes/index");
+
 const app = express();
 app.use(express.json());
 
@@ -18,6 +20,7 @@ app.get("/", (req, res) => {
 });
 
 app.use([importAlert, importError, importDatatable, route]);
+
 
 const privateKey = fs.readFileSync(
   path.join(__dirname, "/keys/private.key"),
@@ -42,7 +45,7 @@ https
     app
   )
   .listen(5050, () =>
-    console.log("HTTPS Server are created and started at port 5001")
+    console.log("HTTPS Server are created and started at port 5050")
   );
 
 app.listen(process.env.PORT || 5051, function () {
