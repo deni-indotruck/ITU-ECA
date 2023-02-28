@@ -4,6 +4,7 @@ const ErrorModel = require("../models/error");
 const AndroidModel = require("../models/android");
 const IphoneModel = require("../models/iphone");
 const EquipmentModel = require("../models/equipment");
+const VisitorModel = require("../models/visitor");
 const DatatableModel = require("../models/datatable");
 const { application } = require("express");
 const app = express.Router();
@@ -593,6 +594,36 @@ app.get("/api/dashboard", async (req, res) => {
         priority: "3",
       });
 
+      let last_data_downloads_android = "0";
+      var android = await AndroidModel.find().select({
+        downloads: 1,
+      });
+      if (android) {
+        last_data_downloads_android = android[0].downloads;
+      }
+
+      let last_data_downloads_iphone = "0";
+      var iphone = await IphoneModel.find().select({
+        downloads: 1,
+      });
+      if (iphone) {
+        last_data_downloads_iphone = iphone[0].downloads;
+      }
+
+      let last_data_counts = "0";
+      var equipment = await EquipmentModel.find().select({
+        counts: 1,
+      });
+      if (equipment) {
+        last_data_counts = equipment[0].counts;
+      }
+
+      let last_data_visitor = "0";
+      const visitor = await VisitorModel.findOne();
+      if (visitor) {
+        last_data_visitor = visitor.visitor;
+      }
+
       res.status(200).json({
         total_error: errorCount,
         total_alert: alertCount,
@@ -603,10 +634,10 @@ app.get("/api/dashboard", async (req, res) => {
         error_priority_1: errorPriority1,
         error_priority_2: errorPriority2,
         error_priority_3: errorPriority3,
-        visitor: "0",
-        android: "0",
-        iphone: "0",
-        equipment: "0",
+        visitor: last_data_visitor.visitor,
+        android: last_data_downloads_android,
+        iphone: last_data_downloads_iphone,
+        equipment: last_data_counts,
       });
     } else if (year && !month) {
       const errorCount = await ErrorModel.find({
@@ -703,6 +734,37 @@ app.get("/api/dashboard", async (req, res) => {
           },
         ],
       }).countDocuments();
+
+      let last_data_downloads_android = "0";
+      var android = await AndroidModel.find().select({
+        downloads: 1,
+      });
+      if (android) {
+        last_data_downloads_android = android[0].downloads;
+      }
+
+      let last_data_downloads_iphone = "0";
+      var iphone = await IphoneModel.find().select({
+        downloads: 1,
+      });
+      if (iphone) {
+        last_data_downloads_iphone = iphone[0].downloads;
+      }
+
+      let last_data_counts = "0";
+      var equipment = await EquipmentModel.find().select({
+        counts: 1,
+      });
+      if (equipment) {
+        last_data_counts = equipment[0].counts;
+      }
+
+      let last_data_visitor = "0";
+      const visitor = await VisitorModel.findOne();
+      if (visitor) {
+        last_data_visitor = visitor.visitor;
+      }
+
       res.status(200).json({
         total_error: errorCount,
         total_alert: alertCount,
@@ -713,10 +775,10 @@ app.get("/api/dashboard", async (req, res) => {
         error_priority_1: errorPriority1,
         error_priority_2: errorPriority2,
         error_priority_3: errorPriority3,
-        visitor: "0",
-        android: "0",
-        iphone: "0",
-        equipment: "0",
+        visitor: last_data_visitor.visitor,
+        android: last_data_downloads_android,
+        iphone: last_data_downloads_iphone,
+        equipment: last_data_counts,
       });
     } else if (!year && month) {
       const errorCount = await ErrorModel.find({
@@ -813,6 +875,37 @@ app.get("/api/dashboard", async (req, res) => {
           },
         ],
       }).countDocuments();
+
+      let last_data_downloads_android = "0";
+      var android = await AndroidModel.find().select({
+        downloads: 1,
+      });
+      if (android) {
+        last_data_downloads_android = android[0].downloads;
+      }
+
+      let last_data_downloads_iphone = "0";
+      var iphone = await IphoneModel.find().select({
+        downloads: 1,
+      });
+      if (iphone) {
+        last_data_downloads_iphone = iphone[0].downloads;
+      }
+
+      let last_data_counts = "0";
+      var equipment = await EquipmentModel.find().select({
+        counts: 1,
+      });
+      if (equipment) {
+        last_data_counts = equipment[0].counts;
+      }
+
+      let last_data_visitor = "0";
+      const visitor = await VisitorModel.findOne();
+      if (visitor) {
+        last_data_visitor = visitor.visitor;
+      }
+
       res.status(200).json({
         total_error: errorCount,
         total_alert: alertCount,
@@ -823,10 +916,10 @@ app.get("/api/dashboard", async (req, res) => {
         error_priority_1: errorPriority1,
         error_priority_2: errorPriority2,
         error_priority_3: errorPriority3,
-        visitor: "0",
-        android: "0",
-        iphone: "0",
-        equipment: "0",
+        visitor: last_data_visitor.visitor,
+        android: last_data_downloads_android,
+        iphone: last_data_downloads_iphone,
+        equipment: last_data_counts,
       });
     } else if (year && month) {
       const errorCount = await ErrorModel.find({
@@ -998,6 +1091,37 @@ app.get("/api/dashboard", async (req, res) => {
           },
         ],
       }).countDocuments();
+
+      let last_data_downloads_android = "0";
+      var android = await AndroidModel.find().select({
+        downloads: 1,
+      });
+      if (android) {
+        last_data_downloads_android = android[0].downloads;
+      }
+
+      let last_data_downloads_iphone = "0";
+      var iphone = await IphoneModel.find().select({
+        downloads: 1,
+      });
+      if (iphone) {
+        last_data_downloads_iphone = iphone[0].downloads;
+      }
+
+      let last_data_counts = "0";
+      var equipment = await EquipmentModel.find().select({
+        counts: 1,
+      });
+      if (equipment) {
+        last_data_counts = equipment[0].counts;
+      }
+
+      let last_data_visitor = "0";
+      const visitor = await VisitorModel.findOne();
+      if (visitor) {
+        last_data_visitor = visitor.visitor;
+      }
+
       res.status(200).json({
         total_error: errorCount,
         total_alert: alertCount,
@@ -1008,10 +1132,10 @@ app.get("/api/dashboard", async (req, res) => {
         error_priority_1: errorPriority1,
         error_priority_2: errorPriority2,
         error_priority_3: errorPriority3,
-        visitor: "0",
-        android: "0",
-        iphone: "0",
-        equipment: "0",
+        visitor: last_data_visitor.visitor,
+        android: last_data_downloads_android,
+        iphone: last_data_downloads_iphone,
+        equipment: last_data_counts,
       });
     }
   } catch (error) {
