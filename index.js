@@ -6,6 +6,7 @@ const actuator = require("express-actuator");
 const cors = require("cors");
 require("dotenv").config();
 require("./config/db");
+const { updateVisitor } = require("./config/cronVisitor");
 const importAlert = require("./config/importAlert");
 const importError = require("./config/importError");
 const importDatatable = require("./config/importDataTables");

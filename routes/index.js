@@ -1,10 +1,12 @@
 const express = require("express");
+const cron = require("node-cron");
 const AlertModel = require("../models/alert");
 const ErrorModel = require("../models/error");
 const AndroidModel = require("../models/android");
 const IphoneModel = require("../models/iphone");
 const EquipmentModel = require("../models/equipment");
 const DatatableModel = require("../models/datatable");
+const VisitorModel = require("../models/visitor");
 const { application } = require("express");
 const app = express.Router();
 const bodyParser = require("body-parser");
@@ -16,7 +18,6 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 app.get("/api/datatable", async (req, res) => {
-
   const apiKey = req.get("apiKey");
   if (apiKey != process.env.API_KEY) {
     return res.status(401).json({
@@ -149,7 +150,6 @@ app.get("/api/datatable", async (req, res) => {
 });
 
 app.get("/api/alert", async (req, res) => {
-
   const apiKey = req.get("apiKey");
   if (apiKey != process.env.API_KEY) {
     return res.status(401).json({
@@ -177,7 +177,6 @@ app.get("/api/alert", async (req, res) => {
 });
 
 app.get("/api/error", async (req, res) => {
-
   const apiKey = req.get("apiKey");
   if (apiKey != process.env.API_KEY) {
     return res.status(401).json({
@@ -1111,4 +1110,48 @@ app.post("/api/android", async (req, res) => {
       .json({ message: "internal server error", error: error.toString() });
   }
 });
+
+app.get("/api/visitor", async (req, res, next) => {
+  const last_data_visitor = await VisitorModel.findOne();
+
+  if (last_data_visitor) {
+    const updateVisitor = await VisitorModel.findByIdAndUpdate(
+      { _id: last_data_visitor._id },
+      {
+        visitor: last_data_visitor.visitor + 3,
+        last_data_visitor: last_data_visitor.visitor,
+      }
+    );
+  } else {
+    const updateVisitor = await VisitorModel.create({
+      visitor: 0,
+      last_data_visitor: 0,
+    });
+  }
+
+  res.json(last_data_visitor);
+});
+
+app.post("/api/visitor", async (req, res) => {
+  const checkVisitor = await VisitorModel.findOne();
+  const visitor = req.body.visitor;
+
+  if (checkVisitor) {
+    const updateVisitor = await VisitorModel.findByIdAndUpdate(
+      {
+        _id: checkVisitor._id,
+      },
+      {
+        visitor: visitor,
+        last_data_visitor: checkVisitor.last_data_visitor,
+      }
+    );
+  } else {
+    const updateVisitor = await VisitorModel.create({
+      visitor: 0,
+      last_data_visitor: 0,
+    });
+  }
+});
+
 module.exports = app;
