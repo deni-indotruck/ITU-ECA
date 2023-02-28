@@ -1033,25 +1033,131 @@ app.get("/api/dashboard2", async (req, res) => {
 
 app.post("/api/android", async (req, res) => {
   try {
-    var update_download_android = req.query.update_download_android;
+    var update_download_android = req.query.update_download_android || 0;
 
-    var last_data_downloads = await AndroidModel.find().select("downloads");
-
-    const android = new AndroidModel({
-      download: update_download_android,
-      last_data_downloads: last_data_downloads,
-    });
-
-    console.log({
-      update_download_android: update_download_android,
-      last_data_downloads: last_data_downloads,
-    });
-
-    // const execAndroid = await AndroidModel.save(android).exec();
+    const dataCount = await AndroidModel.estimatedDocumentCount();
+    if (dataCount == 1) {
+      var last_data_downloads = await AndroidModel.find().select({
+        downloads: 1,
+      });
+      var queryId = await AndroidModel.find().select({
+        _id: 1,
+      });
+      var _id = queryId[0]._id.toHexString();
+      var last_data = last_data_downloads[0].downloads || 0;
+      await AndroidModel.findByIdAndUpdate(
+        { _id: _id },
+        {
+          downloads: update_download_android,
+          last_data_downloads: last_data,
+        },
+        {
+          useFindAndModify: true,
+        }
+      ).exec();
+      const cekAndroid = await AndroidModel.find();
+      res.status(500).json(cekAndroid);
+    } else {
+      const data = new AndroidModel({
+        downloads: update_download_android,
+        last_data_downloads: 0,
+      });
+      data.save();
+      // var saveData = await AndroidModel.save(data);
+      const cekAndroid = await AndroidModel.find();
+      res.status(500).json(cekAndroid);
+    }
   } catch (error) {
     res
       .status(500)
       .json({ message: "internal server error", error: error.toString() });
   }
 });
+
+app.post("/api/iphone", async (req, res) => {
+  try {
+    var update_download_iphone = req.query.update_download_iphone || 0;
+
+    const dataCount = await IphoneModel.estimatedDocumentCount();
+    if (dataCount == 1) {
+      var last_data_downloads = await IphoneModel.find().select({
+        downloads: 1,
+      });
+      var queryId = await IphoneModel.find().select({
+        _id: 1,
+      });
+      var _id = queryId[0]._id.toHexString();
+      var last_data = last_data_downloads[0].downloads || 0;
+      await IphoneModel.findByIdAndUpdate(
+        { _id: _id },
+        {
+          downloads: update_download_iphone,
+          last_data_downloads: last_data,
+        },
+        {
+          useFindAndModify: true,
+        }
+      ).exec();
+      const cekIphone = await IphoneModel.find();
+      res.status(500).json(cekIphone);
+    } else {
+      const data = new IphoneModel({
+        downloads: update_download_iphone,
+        last_data_downloads: 0,
+      });
+      data.save();
+      // var saveData = await IphoneModel.save(data);
+      const cekIphone = await IphoneModel.find();
+      res.status(500).json(cekIphone);
+    }
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "internal server error", error: error.toString() });
+  }
+});
+
+app.post("/api/equipment", async (req, res) => {
+  try {
+    var update_count_equipment = req.query.update_count_equipment || 0;
+
+    const dataCount = await EquipmentModel.estimatedDocumentCount();
+    if (dataCount == 1) {
+      var last_data_counts = await EquipmentModel.find().select({
+        counts: 1,
+      });
+      var queryId = await EquipmentModel.find().select({
+        _id: 1,
+      });
+      var _id = queryId[0]._id.toHexString();
+      var last_data = last_data_counts[0].counts || 0;
+      await EquipmentModel.findByIdAndUpdate(
+        { _id: _id },
+        {
+          counts: update_count_equipment,
+          last_data_counts: last_data,
+        },
+        {
+          useFindAndModify: true,
+        }
+      ).exec();
+      const cekEquipment = await EquipmentModel.find();
+      res.status(500).json(cekEquipment);
+    } else {
+      const data = new EquipmentModel({
+        counts: update_count_equipment,
+        last_data_counts: 0,
+      });
+      data.save();
+      // var saveData = await EquipmentModel.save(data);
+      const cekEquipment = await EquipmentModel.find();
+      res.status(500).json(cekEquipment);
+    }
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "internal server error", error: error.toString() });
+  }
+});
+
 module.exports = app;
