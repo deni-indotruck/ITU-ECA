@@ -1,13 +1,13 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const Equipment = new Schema(
+const Visitor = new Schema(
   {
-    counts: {
+    visitor: {
       type: Number,
       default: "",
     },
-    last_data_counts: {
+    last_data_visitor: {
       type: Number,
       default: "",
     },
@@ -15,4 +15,4 @@ const Equipment = new Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("equipment", Equipment);
+module.exports = mongoose.model("visitor", Visitor);
