@@ -595,27 +595,21 @@ app.get("/api/dashboard", async (req, res) => {
       });
 
       let last_data_downloads_android = 0;
-      var android = await AndroidModel.find().select({
-        downloads: 1,
-      });
+      var android = await AndroidModel.findOne();
       if (android) {
-        last_data_downloads_android = android[0].downloads;
+        last_data_downloads_android = android.downloads;
       }
 
       let last_data_downloads_iphone = 0;
-      var iphone = await IphoneModel.find().select({
-        downloads: 1,
-      });
+      var iphone = await IphoneModel.findOne();
       if (iphone) {
-        last_data_downloads_iphone = iphone[0].downloads;
+        last_data_downloads_iphone = iphone.downloads;
       }
 
       let last_data_counts = 0;
-      var equipment = await EquipmentModel.find().select({
-        counts: 1,
-      });
+      var equipment = await EquipmentModel.findOne();
       if (equipment) {
-        last_data_counts = equipment[0].counts;
+        last_data_counts = equipment.counts;
       }
 
       let last_data_visitor = 0;
@@ -736,27 +730,21 @@ app.get("/api/dashboard", async (req, res) => {
       }).countDocuments();
 
       let last_data_downloads_android = 0;
-      var android = await AndroidModel.find().select({
-        downloads: 1,
-      });
+      var android = await AndroidModel.findOne();
       if (android) {
-        last_data_downloads_android = android[0].downloads;
+        last_data_downloads_android = android.downloads;
       }
 
       let last_data_downloads_iphone = 0;
-      var iphone = await IphoneModel.find().select({
-        downloads: 1,
-      });
+      var iphone = await IphoneModel.findOne();
       if (iphone) {
-        last_data_downloads_iphone = iphone[0].downloads;
+        last_data_downloads_iphone = iphone.downloads;
       }
 
       let last_data_counts = 0;
-      var equipment = await EquipmentModel.find().select({
-        counts: 1,
-      });
+      var equipment = await EquipmentModel.findOne();
       if (equipment) {
-        last_data_counts = equipment[0].counts;
+        last_data_counts = equipment.counts;
       }
 
       let last_data_visitor = 0;
@@ -877,27 +865,21 @@ app.get("/api/dashboard", async (req, res) => {
       }).countDocuments();
 
       let last_data_downloads_android = 0;
-      var android = await AndroidModel.find().select({
-        downloads: 1,
-      });
+      var android = await AndroidModel.findOne();
       if (android) {
-        last_data_downloads_android = android[0].downloads;
+        last_data_downloads_android = android.downloads;
       }
 
       let last_data_downloads_iphone = 0;
-      var iphone = await IphoneModel.find().select({
-        downloads: 1,
-      });
+      var iphone = await IphoneModel.findOne();
       if (iphone) {
-        last_data_downloads_iphone = iphone[0].downloads;
+        last_data_downloads_iphone = iphone.downloads;
       }
 
       let last_data_counts = 0;
-      var equipment = await EquipmentModel.find().select({
-        counts: 1,
-      });
+      var equipment = await EquipmentModel.findOne();
       if (equipment) {
-        last_data_counts = equipment[0].counts;
+        last_data_counts = equipment.counts;
       }
 
       let last_data_visitor = 0;
@@ -1093,27 +1075,21 @@ app.get("/api/dashboard", async (req, res) => {
       }).countDocuments();
 
       let last_data_downloads_android = 0;
-      var android = await AndroidModel.find().select({
-        downloads: 1,
-      });
+      var android = await AndroidModel.findOne();
       if (android) {
-        last_data_downloads_android = android[0].downloads;
+        last_data_downloads_android = android.downloads;
       }
 
       let last_data_downloads_iphone = 0;
-      var iphone = await IphoneModel.find().select({
-        downloads: 1,
-      });
+      var iphone = await IphoneModel.findOne();
       if (iphone) {
-        last_data_downloads_iphone = iphone[0].downloads;
+        last_data_downloads_iphone = iphone.downloads;
       }
 
       let last_data_counts = 0;
-      var equipment = await EquipmentModel.find().select({
-        counts: 1,
-      });
+      var equipment = await EquipmentModel.findOne();
       if (equipment) {
-        last_data_counts = equipment[0].counts;
+        last_data_counts = equipment.counts;
       }
 
       let last_data_visitor = 0;
@@ -1161,14 +1137,12 @@ app.post("/api/android", async (req, res) => {
 
     const dataCount = await AndroidModel.estimatedDocumentCount();
     if (dataCount == 1) {
-      var last_data_downloads = await AndroidModel.find().select({
-        downloads: 1,
-      });
+      var last_data_downloads = await AndroidModel.findOne();
       var queryId = await AndroidModel.find().select({
         _id: 1,
       });
       var _id = queryId[0]._id.toHexString();
-      var last_data = last_data_downloads[0].downloads || 0;
+      var last_data = last_data_downloads.downloads || 0;
       await AndroidModel.findByIdAndUpdate(
         { _id: _id },
         {
@@ -1204,14 +1178,12 @@ app.post("/api/iphone", async (req, res) => {
 
     const dataCount = await IphoneModel.estimatedDocumentCount();
     if (dataCount == 1) {
-      var last_data_downloads = await IphoneModel.find().select({
-        downloads: 1,
-      });
+      var last_data_downloads = await IphoneModel.findOne();
       var queryId = await IphoneModel.find().select({
         _id: 1,
       });
       var _id = queryId[0]._id.toHexString();
-      var last_data = last_data_downloads[0].downloads || 0;
+      var last_data = last_data_downloads.downloads || 0;
       await IphoneModel.findByIdAndUpdate(
         { _id: _id },
         {
@@ -1247,9 +1219,7 @@ app.post("/api/equipment", async (req, res) => {
 
     const dataCount = await EquipmentModel.estimatedDocumentCount();
     if (dataCount == 1) {
-      var last_data_counts = await EquipmentModel.find().select({
-        counts: 1,
-      });
+      var last_data_counts = await EquipmentModel.findOne();
       var queryId = await EquipmentModel.find().select({
         _id: 1,
       });
