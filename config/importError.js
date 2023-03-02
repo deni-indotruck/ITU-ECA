@@ -100,6 +100,7 @@ app.get("/importError", async (req, res) => {
                   if (err) {
                     console.log(`Error Bulk Insert Documents: ${err}`);
                     Error.deleteMany();
+
                     Error_Backup.aggregate([
                       { $match: {} }, // match all documents in the collection
                       { $out: "errors" }, // output the documents to the backup collection
@@ -107,6 +108,7 @@ app.get("/importError", async (req, res) => {
                       if (err) {
                         console.log(err);
                       } else {
+                        Error_Backup.collection.drop();
                         // success move again from error_backups to errors again
                         console.log(`error_backups moved to errors`);
                       }

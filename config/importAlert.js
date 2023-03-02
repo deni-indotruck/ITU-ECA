@@ -5,7 +5,7 @@ const express = require("express");
 const app = express.Router();
 const mongoose = require("mongoose");
 
-app.get("/importAlert007", async (req, res) => {
+app.get("/importAlertOld", async (req, res) => {
   const result = excelToJson({
     sourceFile: "Alerts.xlsx",
     header: {
@@ -100,6 +100,7 @@ app.get("/importAlert", async (req, res) => {
                   if (err) {
                     console.log(`Error Bulk Insert Documents: ${err}`);
                     Alert.deleteMany();
+
                     Alert_Backup.aggregate([
                       { $match: {} }, // match all documents in the collection
                       { $out: "alerts" }, // output the documents to the backup collection
@@ -107,10 +108,12 @@ app.get("/importAlert", async (req, res) => {
                       if (err) {
                         console.log(err);
                       } else {
+                        Alert_Backup.collection.drop();
                         // success move again from alert_backups to alerts again
                         console.log(`Alert_Backups moved to Alerts`);
                       }
                     });
+
                     console.log(`Alert_Backups already Moved Again To Alerts`);
                     res.status(500).send("Error");
                   } else {
