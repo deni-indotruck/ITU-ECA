@@ -1154,7 +1154,7 @@ app.post("/api/android", async (req, res) => {
         }
       ).exec();
       const cekAndroid = await AndroidModel.find();
-      res.status(500).json(cekAndroid);
+      res.status(200).json(cekAndroid);
     } else {
       const data = new AndroidModel({
         downloads: update_download_android,
@@ -1162,8 +1162,9 @@ app.post("/api/android", async (req, res) => {
       });
       data.save();
       // var saveData = await AndroidModel.save(data);
-      const cekAndroid = await AndroidModel.find();
-      res.status(500).json(cekAndroid);
+      const cekAndroid = await AndroidModel.find().exec();
+      console.log(cekAndroid);
+      res.status(200).json(cekAndroid);
     }
   } catch (error) {
     res
@@ -1195,7 +1196,7 @@ app.post("/api/iphone", async (req, res) => {
         }
       ).exec();
       const cekIphone = await IphoneModel.find();
-      res.status(500).json(cekIphone);
+      res.status(200).json(cekIphone);
     } else {
       const data = new IphoneModel({
         downloads: update_download_iphone,
@@ -1204,7 +1205,7 @@ app.post("/api/iphone", async (req, res) => {
       data.save();
       // var saveData = await IphoneModel.save(data);
       const cekIphone = await IphoneModel.find();
-      res.status(500).json(cekIphone);
+      res.status(200).json(cekIphone);
     }
   } catch (error) {
     res
@@ -1236,7 +1237,7 @@ app.post("/api/equipment", async (req, res) => {
         }
       ).exec();
       const cekEquipment = await EquipmentModel.find();
-      res.status(500).json(cekEquipment);
+      res.status(200).json(cekEquipment);
     } else {
       const data = new EquipmentModel({
         counts: update_count_equipment,
@@ -1245,7 +1246,7 @@ app.post("/api/equipment", async (req, res) => {
       data.save();
       // var saveData = await EquipmentModel.save(data);
       const cekEquipment = await EquipmentModel.find();
-      res.status(500).json(cekEquipment);
+      res.status(200).json(cekEquipment);
     }
   } catch (error) {
     res
