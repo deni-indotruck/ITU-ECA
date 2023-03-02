@@ -5,7 +5,7 @@ const express = require("express");
 const app = express.Router();
 const mongoose = require("mongoose");
 
-app.get("/importError", async (req, res) => {
+app.get("/importErrorOld", async (req, res) => {
   const result = excelToJson({
     sourceFile: "Error Codes.xlsx",
     header: {
@@ -38,7 +38,7 @@ app.get("/importError", async (req, res) => {
   res.json(bulk);
 });
 
-app.get("/importError007", async (req, res) => {
+app.get("/importError", async (req, res) => {
   // Check Exist Collection Alert
   const db = mongoose.connection.db;
   // Check if the "errors" collection exists
