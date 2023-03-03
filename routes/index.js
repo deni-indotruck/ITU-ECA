@@ -1872,7 +1872,8 @@ app.post("/api/equipment", async (req, res) => {
         _id: 1,
       });
       var _id = queryId[0]._id.toHexString();
-      var last_data = last_data_counts[0].counts || 0;
+      console.log(update_count_equipment);
+      var last_data = last_data_counts.counts || 0;
       await EquipmentModel.findByIdAndUpdate(
         { _id: _id },
         {
