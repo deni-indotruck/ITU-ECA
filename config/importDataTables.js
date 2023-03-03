@@ -181,10 +181,10 @@ app.get("/CheckValidateDatatable", async (req, res) => {
     fuel_level: "number",
     customer: "string",
   };
+  let isValid = true;
 
   for (let rowNum = 2; worksheet[`A${rowNum}`] !== undefined; rowNum++) {
     const row = {};
-    let isValid = true;
 
     for (let colNum = 0; colNum < expectedColumns.length; colNum++) {
       const column = expectedColumns[colNum];
@@ -210,6 +210,12 @@ app.get("/CheckValidateDatatable", async (req, res) => {
       console.log("Valid row:", row);
       // TODO: insert row into database
     }
+  }
+
+  if (isValid === true) {
+    res.status(200).send("All Row is Valid");
+  } else {
+    res.status(500).send("A Few Row Row is Invalid");
   }
 });
 
