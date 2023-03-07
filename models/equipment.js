@@ -3,11 +3,11 @@ const Schema = mongoose.Schema;
 
 const Equipment = new Schema(
   {
-    downloads: {
+    counts: {
       type: Number,
       default: "",
     },
-    last_data_downloads: {
+    last_data_counts: {
       type: Number,
       default: "",
     },
