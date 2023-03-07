@@ -89,7 +89,6 @@ app.get("/api/renault/detail-truck", async (req, res) => {
           .snapshotData.gnssPosition.latitude,
     });
   } catch (error) {
-    console.log(error);
     console.log("can not connected to renault truck");
     if (error.response.status == 400) {
       res.json("vin format wrong!");
