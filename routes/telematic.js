@@ -89,13 +89,28 @@ app.get("/api/renault/detail-truck", async (req, res) => {
           .snapshotData.gnssPosition.latitude,
     });
   } catch (error) {
+    console.log(error);
     console.log("can not connected to renault truck");
     if (error.response.status == 400) {
-      res.json("vin not found");
-      console.log("vin not found");
+      res.json("vin format wrong!");
+      console.log("vin format wrong!");
     } else if (error.response.status == 500) {
       res.json("username or password wrong!");
       console.log("username or password wrong!");
+    } else if (error.response.status == 429) {
+      res.json("unable get data, please refresh");
+      console.log("unable get data, please refresh");
+    } else if (error.response.status == 401) {
+      res.json("Unauthorized, Credential expired");
+      console.log("Unauthorized, Credential expired");
+    } else if (error.response.status == 404) {
+      res.json("VIN Not Found");
+      console.log("VIN Not Found");
+    } else if (error.response.status == 406) {
+      res.json("Unsupported Accept Parameter");
+      console.log("Unsupported Accept Parameter");
+    } else {
+      res.json(error);
     }
   }
 });
