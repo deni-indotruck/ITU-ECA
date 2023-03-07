@@ -1,4 +1,5 @@
 const express = require("express");
+const cron = require("node-cron");
 const AlertModel = require("../models/alert");
 const ErrorModel = require("../models/error");
 const AndroidModel = require("../models/android");
@@ -6,6 +7,7 @@ const IphoneModel = require("../models/iphone");
 const EquipmentModel = require("../models/equipment");
 const VisitorModel = require("../models/visitor");
 const DatatableModel = require("../models/datatable");
+const VisitorModel = require("../models/visitor");
 const { application } = require("express");
 const app = express.Router();
 const bodyParser = require("body-parser");
@@ -18,8 +20,16 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 app.get("/api/datatable", async (req, res) => {
+  const apiKey = req.get("apiKey");
+  if (apiKey != process.env.API_KEY) {
+    return res.status(401).json({
+      message: "Anauthorized",
+    });
+  }
+
   var page = req.query.page;
   var per_page = req.query.limit || 10;
+
   const year = req.query.year;
   const month = req.query.month;
   const company = req.query.company;
@@ -309,8 +319,16 @@ app.get("/api/datatable", async (req, res) => {
 });
 
 app.get("/api/alert", async (req, res) => {
+  const apiKey = req.get("apiKey");
+  if (apiKey != process.env.API_KEY) {
+    return res.status(401).json({
+      message: "Anauthorized",
+    });
+  }
+
   var page = req.query.page;
   var per_page = req.query.limit || 10;
+
   try {
     const totalAlert = await AlertModel.estimatedDocumentCount();
     const alert = await AlertModel.find()
@@ -328,8 +346,16 @@ app.get("/api/alert", async (req, res) => {
 });
 
 app.get("/api/error", async (req, res) => {
+  const apiKey = req.get("apiKey");
+  if (apiKey != process.env.API_KEY) {
+    return res.status(401).json({
+      message: "Anauthorized",
+    });
+  }
+
   var page = req.query.page;
   var per_page = req.query.limit || 10;
+
   try {
     const totalError = await ErrorModel.estimatedDocumentCount();
     const error = await ErrorModel.find()
@@ -346,6 +372,12 @@ app.get("/api/error", async (req, res) => {
 });
 
 app.get("/api/top10error", async (req, res) => {
+  const apiKey = req.get("apiKey");
+  if (apiKey != process.env.API_KEY) {
+    return res.status(401).json({
+      message: "Anauthorized",
+    });
+  }
   const year = parseInt(req.query.year);
   const month = parseInt(req.query.month);
   const company = req.query.company;
@@ -600,6 +632,12 @@ app.get("/api/top10error", async (req, res) => {
 });
 
 app.get("/api/top10alert", async (req, res) => {
+  const apiKey = req.get("apiKey");
+  if (apiKey != process.env.API_KEY) {
+    return res.status(401).json({
+      message: "Anauthorized",
+    });
+  }
   const year = parseInt(req.query.year);
   const month = parseInt(req.query.month);
   const company = req.query.company;
@@ -854,6 +892,12 @@ app.get("/api/top10alert", async (req, res) => {
 });
 
 app.get("/api/top10errorbymachine", async (req, res) => {
+  const apiKey = req.get("apiKey");
+  if (apiKey != process.env.API_KEY) {
+    return res.status(401).json({
+      message: "Anauthorized",
+    });
+  }
   const year = parseInt(req.query.year);
   const month = parseInt(req.query.month);
   const company = req.query.company;
@@ -1159,6 +1203,12 @@ app.get("/api/top10errorbymachine", async (req, res) => {
 });
 
 app.get("/api/dashboard", async (req, res) => {
+  const apiKey = req.get("apiKey");
+  if (apiKey != process.env.API_KEY) {
+    return res.status(401).json({
+      message: "Anauthorized",
+    });
+  }
   try {
     const year = req.query.year;
     const month = req.query.month;
@@ -1714,6 +1764,12 @@ app.get("/api/dashboard", async (req, res) => {
 });
 
 app.get("/api/dashboard2", async (req, res) => {
+  const apiKey = req.get("apiKey");
+  if (apiKey != process.env.API_KEY) {
+    return res.status(401).json({
+      message: "Anauthorized",
+    });
+  }
   const yearToFind = 4;
   const errorCount = await ErrorModel.find({
     $expr: {
@@ -1848,119 +1904,48 @@ app.post("/api/equipment", async (req, res) => {
   }
 });
 
-// app.get("/api/renault/detail-truck", async (req, res) => {
-//   const vin = req.query.vin;
+app.get("/api/visitor", async (req, res, next) => {
+  const last_data_visitor = await VisitorModel.findOne();
 
-//   try {
-//     const vehiclePositions = await axios.get(
-//       `https://api.renault-trucks.com/vehicle/vehiclestatuses?vin=${vin}&latestOnly=true`,
-//       {
-//         headers: {
-//           Accept:
-//             "application/x.volvogroup.com.vehiclestatuses.v1.0+json; UTF-8",
-//         },
-//         auth: {
-//           username: "5BB893139A",
-//           password: "XapyhWUruM",
-//         },
-//       }
-//     );
-//     if (vehiclePositions) {
-//       console.log("successfully connected to renault trucks");
-//     }
+  if (last_data_visitor) {
+    const updateVisitor = await VisitorModel.findByIdAndUpdate(
+      { _id: last_data_visitor._id },
+      {
+        visitor: last_data_visitor.visitor + 3,
+        last_data_visitor: last_data_visitor.visitor,
+      }
+    );
+  } else {
+    const updateVisitor = await VisitorModel.create({
+      visitor: 0,
+      last_data_visitor: 0,
+    });
+  }
 
-//     var stringData = "";
-//     // hrTotalVehicleDistance
-//     if (
-//       !vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0]
-//         .hrTotalVehicleDistance
-//     ) {
-//       stringData = stringData + `hrTotalVehicleDistance = null, `;
-//     } else {
-//       stringData =
-//         stringData +
-//         `hrTotalVehicleDistance = ${vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0].hrTotalVehicleDistance} , `;
-//     }
+  res.json(last_data_visitor);
+});
 
-//     // totalEngineHours
-//     if (
-//       !vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0]
-//         .totalEngineHours
-//     ) {
-//       stringData = stringData + `totalEngineHours = null, `;
-//     } else {
-//       stringData =
-//         stringData +
-//         `totalEngineHours = ${vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0].totalEngineHours} , `;
-//     }
+app.post("/api/visitor", async (req, res) => {
+  const checkVisitor = await VisitorModel.findOne();
+  const visitor = req.body.visitor;
 
-//     // latitude
-//     if (
-//       !vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0]
-//         .snapshotData.gnssPosition.latitude
-//     ) {
-//       stringData = stringData + `latitude = null, `;
-//     } else {
-//       stringData =
-//         stringData +
-//         `latitude = ${vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0].snapshotData.gnssPosition.latitude} , `;
-//     }
+  if (checkVisitor) {
+    const updateVisitor = await VisitorModel.findByIdAndUpdate(
+      {
+        _id: checkVisitor._id,
+      },
+      {
+        visitor: visitor,
+        last_data_visitor: checkVisitor.last_data_visitor,
+      }
+    );
+  } else {
+    const updateVisitor = await VisitorModel.create({
+      visitor: 0,
+      last_data_visitor: 0,
+    });
+  }
+});
 
-//     // longitude
-//     if (
-//       !vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0]
-//         .snapshotData.gnssPosition.longitude
-//     ) {
-//       stringData = stringData + `longitude = null, `;
-//     } else {
-//       stringData =
-//         stringData +
-//         `longitude = ${vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0].snapshotData.gnssPosition.longitude} , `;
-//     }
-
-//     console.log(stringData);
-
-//     res.json({
-//       hrTotalVehicleDistance:
-//         vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0]
-//           .hrTotalVehicleDistance,
-//       totalEngineHours:
-//         vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0]
-//           .totalEngineHours,
-//       longitude:
-//         vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0]
-//           .snapshotData.gnssPosition.longitude,
-//       latitude:
-//         vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0]
-//           .snapshotData.gnssPosition.latitude,
-//     });
-//   } catch (error) {
-//     if (error.response.status == 400) {
-//       console.log("connected to renault truck");
-//       res.json("vin format wrong!");
-//       console.log("vin format wrong!");
-//     } else if (error.response.status == 500) {
-//       console.log("connected to renault truck");
-//       res.json("username or password wrong!");
-//       console.log("username or password wrong!");
-//     } else if (error.response.status == 429) {
-//       // console.log("connected to renault truck");
-//       res.json("unable get data, please refresh");
-//       console.log("unable get data, please refresh");
-//     } else if (error.response.status == 401) {
-//       res.json("Unauthorized, Credential expired");
-//       console.log("Unauthorized, Credential expired");
-//     } else if (error.response.status == 404) {
-//       res.json("VIN Not Found");
-//       console.log("VIN Not Found");
-//     } else if (error.response.status == 406) {
-//       res.json("Unsupported Accept Parameter");
-//       console.log("Unsupported Accept Parameter");
-//     } else {
-//       console.log("can not connected to renault truck");
-//       res.json(error);
-//     }
-//   }
-// });
 
 module.exports = app;
