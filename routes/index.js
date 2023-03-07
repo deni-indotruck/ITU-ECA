@@ -11,6 +11,7 @@ const VisitorModel = require("../models/visitor");
 const { application } = require("express");
 const app = express.Router();
 const bodyParser = require("body-parser");
+const axios = require("axios");
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -1945,5 +1946,6 @@ app.post("/api/visitor", async (req, res) => {
     });
   }
 });
+
 
 module.exports = app;
