@@ -83,7 +83,8 @@ app.get("/api/telematic", async (req, res) => {
 
       console.log(stringData);
 
-      res.json({
+      res.status(200).json({
+        status: 200,
         hrTotalVehicleDistance:
           vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0]
             .hrTotalVehicleDistance,
@@ -100,31 +101,31 @@ app.get("/api/telematic", async (req, res) => {
     } catch (error) {
       if (error.response.status == 400) {
         console.log("connected to renault truck");
-        res.json("vin format wrong!");
+        res.status(400).json("vin format wrong!");
         console.log("vin format wrong!");
       } else if (error.response.status == 500) {
         console.log("connected to renault truck");
-        res.json("username or password wrong!");
+        res.status(500).json("username or password wrong!");
         console.log("username or password wrong!");
       } else if (error.response.status == 429) {
         console.log("can't connected to renault truck");
-        res.json("unable get data, please refresh");
+        res.status(429).json("unable get data, please refresh");
         console.log("unable get data, please refresh");
       } else if (error.response.status == 401) {
         console.log("can't connected to renault truck");
-        res.json("Unauthorized, Credential expired");
+        res.status(401).json("Unauthorized, Credential expired");
         console.log("Unauthorized, Credential expired");
       } else if (error.response.status == 404) {
         console.log("connected to renault truck");
-        res.json("VIN Not Found");
+        res.status(404).json("VIN Not Found");
         console.log("VIN Not Found");
       } else if (error.response.status == 406) {
         console.log("connected to renault truck");
-        res.json("Unsupported Accept Parameter");
+        res.status(406).json("Unsupported Accept Parameter");
         console.log("Unsupported Accept Parameter");
       } else {
         console.log("can not connected to renault truck");
-        res.json(error);
+        res.status(500).json(error);
       }
     }
   }
