@@ -31,8 +31,9 @@ app.get("/api/datatable", async (req, res) => {
 
   const year = req.query.year;
   const month = req.query.month;
+  const company = req.query.company;
   try {
-    if (!year && !month) {
+    if (!year && !month && !company) {
       const totalDatatable = await DatatableModel.estimatedDocumentCount();
       const datatable = await DatatableModel.find()
         .skip((page - 1) * per_page)
@@ -49,7 +50,28 @@ app.get("/api/datatable", async (req, res) => {
       res
         .status(200)
         .json({ totalData: totalDatatable, currentPage: page, data: result });
-    } else if (year && !month) {
+    } else if (!year && !month && company) {
+      const totalDatatable = await DatatableModel.estimatedDocumentCount({
+        machine: { $regex: company },
+      });
+      const datatable = await DatatableModel.find({
+        machine: { $regex: company },
+      })
+        .skip((page - 1) * per_page)
+        .limit(per_page);
+
+      const result = datatable.map((v) => {
+        const [company, ...rest] = v.machine.split(" ");
+        return {
+          company: company,
+          machine: v.machine,
+          total_machine_hour: v.total_machine_hour,
+        };
+      });
+      res
+        .status(200)
+        .json({ totalData: totalDatatable, currentPage: page, data: result });
+    } else if (year && !month && !company) {
       const totalDatatable = await DatatableModel.find({
         $expr: {
           $eq: [{ $year: "$last_update_selected_date" }, year],
@@ -74,7 +96,52 @@ app.get("/api/datatable", async (req, res) => {
       res
         .status(200)
         .json({ totalData: totalDatatable, currentPage: page, data: result });
-    } else if (month && !year) {
+    } else if (year && !month && company) {
+      const totalDatatable = await DatatableModel.find({
+        $and: [
+          {
+            $expr: {
+              $eq: [{ $year: "$last_update_selected_date" }, year],
+            },
+          },
+          {
+            machine: {
+              $regex: company,
+              $options: "i",
+            },
+          },
+        ],
+      }).countDocuments();
+      const datatable = await DatatableModel.find({
+        $and: [
+          {
+            $expr: {
+              $eq: [{ $year: "$last_update_selected_date" }, year],
+            },
+          },
+          {
+            machine: {
+              $regex: company,
+              $options: "i",
+            },
+          },
+        ],
+      })
+        .skip((page - 1) * per_page)
+        .limit(per_page);
+
+      const result = datatable.map((v) => {
+        const [company, ...rest] = v.machine.split(" ");
+        return {
+          company: company,
+          machine: v.machine,
+          total_machine_hour: v.total_machine_hour,
+        };
+      });
+      res
+        .status(200)
+        .json({ totalData: totalDatatable, currentPage: page, data: result });
+    } else if (month && !year && !company) {
       const totalDatatable = await DatatableModel.find({
         $expr: {
           $eq: [{ $month: "$last_update_selected_date" }, month],
@@ -99,7 +166,52 @@ app.get("/api/datatable", async (req, res) => {
       res
         .status(200)
         .json({ totalData: totalDatatable, currentPage: page, data: result });
-    } else if (year && month) {
+    } else if (month && !year && company) {
+      const totalDatatable = await DatatableModel.find({
+        $and: [
+          {
+            $expr: {
+              $eq: [{ $month: "$last_update_selected_date" }, month],
+            },
+          },
+          {
+            machine: {
+              $regex: company,
+              $options: "i",
+            },
+          },
+        ],
+      }).countDocuments();
+      const datatable = await DatatableModel.find({
+        $and: [
+          {
+            $expr: {
+              $eq: [{ $month: "$last_update_selected_date" }, month],
+            },
+          },
+          {
+            machine: {
+              $regex: company,
+              $options: "i",
+            },
+          },
+        ],
+      })
+        .skip((page - 1) * per_page)
+        .limit(per_page);
+
+      const result = datatable.map((v) => {
+        const [company, ...rest] = v.machine.split(" ");
+        return {
+          company: company,
+          machine: v.machine,
+          total_machine_hour: v.total_machine_hour,
+        };
+      });
+      res
+        .status(200)
+        .json({ totalData: totalDatatable, currentPage: page, data: result });
+    } else if (year && month && !company) {
       const totalDatatable = await DatatableModel.find({
         $and: [
           {
@@ -124,6 +236,61 @@ app.get("/api/datatable", async (req, res) => {
           {
             $expr: {
               $eq: [{ $month: "$last_update_selected_date" }, month],
+            },
+          },
+        ],
+      })
+        .skip((page - 1) * per_page)
+        .limit(per_page);
+
+      const result = datatable.map((v) => {
+        const [company, ...rest] = v.machine.split(" ");
+        return {
+          company: company,
+          machine: v.machine,
+          total_machine_hour: v.total_machine_hour,
+        };
+      });
+      res
+        .status(200)
+        .json({ totalData: totalDatatable, currentPage: page, data: result });
+    } else if (year && month && company) {
+      const totalDatatable = await DatatableModel.find({
+        $and: [
+          {
+            $expr: {
+              $eq: [{ $year: "$last_update_selected_date" }, year],
+            },
+          },
+          {
+            $expr: {
+              $eq: [{ $month: "$last_update_selected_date" }, month],
+            },
+          },
+          {
+            machine: {
+              $regex: company,
+              $options: "i",
+            },
+          },
+        ],
+      }).countDocuments();
+      const datatable = await DatatableModel.find({
+        $and: [
+          {
+            $expr: {
+              $eq: [{ $year: "$last_update_selected_date" }, year],
+            },
+          },
+          {
+            $expr: {
+              $eq: [{ $month: "$last_update_selected_date" }, month],
+            },
+          },
+          {
+            machine: {
+              $regex: company,
+              $options: "i",
             },
           },
         ],
@@ -212,8 +379,9 @@ app.get("/api/top10error", async (req, res) => {
   }
   const year = parseInt(req.query.year);
   const month = parseInt(req.query.month);
+  const company = req.query.company;
   try {
-    if (year && !month) {
+    if (year && !month && !company) {
       const top10error = await ErrorModel.aggregate([
         {
           $match: {
@@ -239,7 +407,38 @@ app.get("/api/top10error", async (req, res) => {
       ]);
 
       res.status(200).json(top10error);
-    } else if (month && !year) {
+    } else if (year && !month && company) {
+      const top10error = await ErrorModel.aggregate([
+        {
+          $match: {
+            $expr: {
+              $eq: [{ $year: "$date" }, year],
+            },
+          },
+        },
+        {
+          $match: {
+            company: { $regex: company, $options: "i" },
+          },
+        },
+        {
+          $group: {
+            _id: "$error_type",
+            count: { $sum: 1 },
+          },
+        },
+        {
+          $sort: {
+            count: -1,
+          },
+        },
+        {
+          $limit: 10,
+        },
+      ]);
+
+      res.status(200).json(top10error);
+    } else if (month && !year && !company) {
       const top10error = await ErrorModel.aggregate([
         {
           $match: {
@@ -265,7 +464,43 @@ app.get("/api/top10error", async (req, res) => {
       ]);
 
       res.status(200).json(top10error);
-    } else if (year && month) {
+    } else if (month && !year && company) {
+      const top10error = await ErrorModel.aggregate([
+        {
+          $match: {
+            $and: [
+              {
+                $expr: {
+                  $eq: [{ $month: "$date" }, month],
+                },
+              },
+              {
+                company: {
+                  $regex: company,
+                  $options: "i",
+                },
+              },
+            ],
+          },
+        },
+        {
+          $group: {
+            _id: "$error_type",
+            count: { $sum: 1 },
+          },
+        },
+        {
+          $sort: {
+            count: -1,
+          },
+        },
+        {
+          $limit: 10,
+        },
+      ]);
+
+      res.status(200).json(top10error);
+    } else if (year && month && !company) {
       const top10error = await ErrorModel.aggregate([
         {
           $match: {
@@ -300,8 +535,76 @@ app.get("/api/top10error", async (req, res) => {
       ]);
 
       res.status(200).json(top10error);
-    } else if (!year && !month) {
+    } else if (year && month && company) {
       const top10error = await ErrorModel.aggregate([
+        {
+          $match: {
+            $and: [
+              {
+                $expr: {
+                  $eq: [{ $year: "$date" }, year],
+                },
+              },
+              {
+                $expr: {
+                  $eq: [{ $month: "$date" }, month],
+                },
+              },
+              {
+                company: {
+                  $regex: company,
+                  $options: "i",
+                },
+              },
+            ],
+          },
+        },
+        {
+          $group: {
+            _id: "$error_type",
+            count: { $sum: 1 },
+          },
+        },
+        {
+          $sort: {
+            count: -1,
+          },
+        },
+        {
+          $limit: 10,
+        },
+      ]);
+
+      res.status(200).json(top10error);
+    } else if (!year && !month && !company) {
+      const top10error = await ErrorModel.aggregate([
+        {
+          $group: {
+            _id: "$error_type",
+            count: { $sum: 1 },
+          },
+        },
+        {
+          $sort: {
+            count: -1,
+          },
+        },
+        {
+          $limit: 10,
+        },
+      ]);
+
+      res.status(200).json(top10error);
+    } else if (!year && !month && company) {
+      const top10error = await ErrorModel.aggregate([
+        {
+          $match: {
+            company: {
+              $regex: company,
+              $options: "i",
+            },
+          },
+        },
         {
           $group: {
             _id: "$error_type",
@@ -336,8 +639,9 @@ app.get("/api/top10alert", async (req, res) => {
   }
   const year = parseInt(req.query.year);
   const month = parseInt(req.query.month);
+  const company = req.query.company;
   try {
-    if (year && !month) {
+    if (year && !month && !company) {
       const top10alert = await AlertModel.aggregate([
         {
           $match: {
@@ -364,7 +668,39 @@ app.get("/api/top10alert", async (req, res) => {
         },
       ]);
       res.status(200).json(top10alert);
-    } else if (month && !year) {
+    } else if (year && !month && company) {
+      const top10alert = await AlertModel.aggregate([
+        {
+          $match: {
+            $expr: {
+              $eq: [{ $year: "$date" }, year],
+            },
+          },
+        },
+        {
+          $match: {
+            company: { $regex: company, $options: "i" },
+          },
+        },
+        {
+          $group: {
+            _id: "$alert_type",
+            count: {
+              $sum: 1,
+            },
+          },
+        },
+        {
+          $sort: {
+            count: -1,
+          },
+        },
+        {
+          $limit: 10,
+        },
+      ]);
+      res.status(200).json(top10alert);
+    } else if (month && !year && !company) {
       const top10alert = await AlertModel.aggregate([
         {
           $match: {
@@ -391,7 +727,39 @@ app.get("/api/top10alert", async (req, res) => {
         },
       ]);
       res.status(200).json(top10alert);
-    } else if (year && month) {
+    } else if (month && !year && company) {
+      const top10alert = await AlertModel.aggregate([
+        {
+          $match: {
+            $expr: {
+              $eq: [{ $month: "$date" }, month],
+            },
+          },
+        },
+        {
+          $match: {
+            company: { $regex: company, $options: "i" },
+          },
+        },
+        {
+          $group: {
+            _id: "$alert_type",
+            count: {
+              $sum: 1,
+            },
+          },
+        },
+        {
+          $sort: {
+            count: -1,
+          },
+        },
+        {
+          $limit: 10,
+        },
+      ]);
+      res.status(200).json(top10alert);
+    } else if (year && month && !company) {
       const top10alert = await AlertModel.aggregate([
         {
           $match: {
@@ -427,8 +795,75 @@ app.get("/api/top10alert", async (req, res) => {
         },
       ]);
       res.status(200).json(top10alert);
-    } else if (!month && !year) {
+    } else if (year && month && company) {
       const top10alert = await AlertModel.aggregate([
+        {
+          $match: {
+            $and: [
+              {
+                $expr: {
+                  $eq: [{ $year: "$date" }, year],
+                },
+              },
+              {
+                $expr: {
+                  $eq: [{ $month: "$date" }, month],
+                },
+              },
+              {
+                company: { $regex: company, $options: "i" },
+              },
+            ],
+          },
+        },
+        {
+          $group: {
+            _id: "$alert_type",
+            count: {
+              $sum: 1,
+            },
+          },
+        },
+        {
+          $sort: {
+            count: -1,
+          },
+        },
+        {
+          $limit: 10,
+        },
+      ]);
+      res.status(200).json(top10alert);
+    } else if (!month && !year && !company) {
+      const top10alert = await AlertModel.aggregate([
+        {
+          $group: {
+            _id: "$alert_type",
+            count: {
+              $sum: 1,
+            },
+          },
+        },
+        {
+          $sort: {
+            count: -1,
+          },
+        },
+        {
+          $limit: 10,
+        },
+      ]);
+      res.status(200).json(top10alert);
+    } else if (!month && !year && company) {
+      const top10alert = await AlertModel.aggregate([
+        {
+          $match: {
+            company: {
+              $regex: company,
+              $options: "i",
+            },
+          },
+        },
         {
           $group: {
             _id: "$alert_type",
@@ -464,8 +899,9 @@ app.get("/api/top10errorbymachine", async (req, res) => {
   }
   const year = parseInt(req.query.year);
   const month = parseInt(req.query.month);
+  const company = req.query.company;
   try {
-    if (year && !month) {
+    if (year && !month && !company) {
       const top10errorbymachine = await ErrorModel.aggregate([
         {
           $match: {
@@ -501,7 +937,48 @@ app.get("/api/top10errorbymachine", async (req, res) => {
       //   },
       // ]);
       res.status(200).json(top10errorbymachine);
-    } else if (month && !year) {
+    } else if (year && !month && company) {
+      const top10errorbymachine = await ErrorModel.aggregate([
+        {
+          $match: {
+            $expr: {
+              $eq: [{ $year: "$date" }, year],
+            },
+          },
+        },
+        {
+          $match: {
+            company: { $regex: company, $options: "i" },
+          },
+        },
+        {
+          $group: {
+            _id: "$model",
+            count: {
+              $sum: 1,
+            },
+          },
+        },
+        {
+          $sort: {
+            count: -1,
+          },
+        },
+        {
+          $limit: 10,
+        },
+      ]);
+      // const top10errorbymachine = await ErrorModel.aggregate([
+      //   {
+      //     $match: {
+      //       $expr: {
+      //         $eq: [{ $year: "$date" }, year],
+      //       },
+      //     },
+      //   },
+      // ]);
+      res.status(200).json(top10errorbymachine);
+    } else if (month && !year && !company) {
       const top10errorbymachine = await ErrorModel.aggregate([
         {
           $match: {
@@ -537,7 +1014,48 @@ app.get("/api/top10errorbymachine", async (req, res) => {
       //   },
       // ]);
       res.status(200).json(top10errorbymachine);
-    } else if (year && month) {
+    } else if (month && !year && company) {
+      const top10errorbymachine = await ErrorModel.aggregate([
+        {
+          $match: {
+            $expr: {
+              $eq: [{ $month: "$date" }, month],
+            },
+          },
+        },
+        {
+          $match: {
+            company: { $regex: company, $options: "i" },
+          },
+        },
+        {
+          $group: {
+            _id: "$model",
+            count: {
+              $sum: 1,
+            },
+          },
+        },
+        {
+          $sort: {
+            count: -1,
+          },
+        },
+        {
+          $limit: 10,
+        },
+      ]);
+      // const top10errorbymachine = await ErrorModel.aggregate([
+      //   {
+      //     $match: {
+      //       $expr: {
+      //         $eq: [{ $year: "$date" }, year],
+      //       },
+      //     },
+      //   },
+      // ]);
+      res.status(200).json(top10errorbymachine);
+    } else if (year && month && !company) {
       const top10errorbymachine = await ErrorModel.aggregate([
         {
           $match: {
@@ -582,8 +1100,81 @@ app.get("/api/top10errorbymachine", async (req, res) => {
       //   },
       // ]);
       res.status(200).json(top10errorbymachine);
-    } else if (!year && !month) {
+    } else if (year && month && company) {
       const top10errorbymachine = await ErrorModel.aggregate([
+        {
+          $match: {
+            $and: [
+              {
+                $expr: {
+                  $eq: [{ $year: "$date" }, year],
+                },
+              },
+              {
+                $expr: {
+                  $eq: [{ $month: "$date" }, month],
+                },
+              },
+              {
+                company: { $regex: company, $options: "i" },
+              },
+            ],
+          },
+        },
+        {
+          $group: {
+            _id: "$model",
+            count: {
+              $sum: 1,
+            },
+          },
+        },
+        {
+          $sort: {
+            count: -1,
+          },
+        },
+        {
+          $limit: 10,
+        },
+      ]);
+      // const top10errorbymachine = await ErrorModel.aggregate([
+      //   {
+      //     $match: {
+      //       $expr: {
+      //         $eq: [{ $year: "$date" }, year],
+      //       },
+      //     },
+      //   },
+      // ]);
+      res.status(200).json(top10errorbymachine);
+    } else if (!year && !month && !company) {
+      const top10errorbymachine = await ErrorModel.aggregate([
+        {
+          $group: {
+            _id: "$model",
+            count: {
+              $sum: 1,
+            },
+          },
+        },
+        {
+          $sort: {
+            count: -1,
+          },
+        },
+        {
+          $limit: 10,
+        },
+      ]);
+      res.status(200).json(top10errorbymachine);
+    } else if (!year && !month && company) {
+      const top10errorbymachine = await ErrorModel.aggregate([
+        {
+          $match: {
+            company: { $regex: company, $options: "i" },
+          },
+        },
         {
           $group: {
             _id: "$model",
@@ -1210,7 +1801,7 @@ app.post("/api/android", async (req, res) => {
         }
       ).exec();
       const cekAndroid = await AndroidModel.find();
-      res.status(500).json(cekAndroid);
+      res.status(200).json(cekAndroid);
     } else {
       const data = new AndroidModel({
         downloads: update_download_android,
@@ -1218,8 +1809,9 @@ app.post("/api/android", async (req, res) => {
       });
       data.save();
       // var saveData = await AndroidModel.save(data);
-      const cekAndroid = await AndroidModel.find();
-      res.status(500).json(cekAndroid);
+      const cekAndroid = await AndroidModel.find().exec();
+      console.log(cekAndroid);
+      res.status(200).json(cekAndroid);
     }
   } catch (error) {
     res
@@ -1251,7 +1843,7 @@ app.post("/api/iphone", async (req, res) => {
         }
       ).exec();
       const cekIphone = await IphoneModel.find();
-      res.status(500).json(cekIphone);
+      res.status(200).json(cekIphone);
     } else {
       const data = new IphoneModel({
         downloads: update_download_iphone,
@@ -1260,7 +1852,7 @@ app.post("/api/iphone", async (req, res) => {
       data.save();
       // var saveData = await IphoneModel.save(data);
       const cekIphone = await IphoneModel.find();
-      res.status(500).json(cekIphone);
+      res.status(200).json(cekIphone);
     }
   } catch (error) {
     res
@@ -1280,7 +1872,8 @@ app.post("/api/equipment", async (req, res) => {
         _id: 1,
       });
       var _id = queryId[0]._id.toHexString();
-      var last_data = last_data_counts[0].counts || 0;
+      console.log(update_count_equipment);
+      var last_data = last_data_counts.counts || 0;
       await EquipmentModel.findByIdAndUpdate(
         { _id: _id },
         {
@@ -1292,7 +1885,7 @@ app.post("/api/equipment", async (req, res) => {
         }
       ).exec();
       const cekEquipment = await EquipmentModel.find();
-      res.status(500).json(cekEquipment);
+      res.status(200).json(cekEquipment);
     } else {
       const data = new EquipmentModel({
         counts: update_count_equipment,
@@ -1301,7 +1894,7 @@ app.post("/api/equipment", async (req, res) => {
       data.save();
       // var saveData = await EquipmentModel.save(data);
       const cekEquipment = await EquipmentModel.find();
-      res.status(500).json(cekEquipment);
+      res.status(200).json(cekEquipment);
     }
   } catch (error) {
     res
@@ -1353,69 +1946,5 @@ app.post("/api/visitor", async (req, res) => {
   }
 });
 
-app.get("/api/renault/detail-truck", async (req, res) => {
-  const vin = req.query.vin;
-
-  try {
-    const vehiclePositions = await axios.get(
-      `https://api.renault-trucks.com/vehicle/vehiclestatuses?vin=${vin}&latestOnly=true`,
-      {
-        headers: {
-          Accept:
-            "application/x.volvogroup.com.vehiclestatuses.v1.0+json; UTF-8",
-        },
-        auth: {
-          username: "5BB893139A",
-          password: "XapyhWUruM",
-        },
-      }
-    );
-    if (vehiclePositions) {
-      console.log("successfully connected to renault trucks");
-    }
-
-    if (vehiclePositions.status == 400) {
-      console.log("vin not found");
-    }
-
-    if (vehiclePositions.status == 500) {
-      console.log("username or password wrong!");
-    }
-
-    if (
-      !vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0]
-        .snapshotData.gnssPosition.latitude
-    ) {
-      console.log("latitude null");
-    } else {
-      console.log({
-        latitude:
-          vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0]
-            .snapshotData.gnssPosition.latitude,
-      });
-    }
-
-    res.json({
-      hrTotalVehicleDistance:
-        vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0]
-          .hrTotalVehicleDistance,
-      totalEngineHours:
-        vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0]
-          .totalEngineHours,
-      longitude:
-        vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0]
-          .snapshotData.gnssPosition.longitude,
-      latitude:
-        vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0]
-          .snapshotData.gnssPosition.latitude,
-    });
-  } catch (error) {
-    console.log("can not connected to renault truck");
-    if (error.response.status == 400) {
-      res.json("vin not found");
-      console.log("vin not found");
-    }
-  }
-});
 
 module.exports = app;
