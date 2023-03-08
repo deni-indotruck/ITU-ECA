@@ -42,7 +42,9 @@ app.get("/api/telematic", async (req, res) => {
       } else {
         stringData =
           stringData +
-          `hrTotalVehicleDistance = ${vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0].hrTotalVehicleDistance} , `;
+          `hrTotalVehicleDistance = ${vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0].hrTotalVehicleDistance.toFixed(
+            3
+          )} , `;
       }
 
       // totalEngineHours
@@ -54,7 +56,9 @@ app.get("/api/telematic", async (req, res) => {
       } else {
         stringData =
           stringData +
-          `totalEngineHours = ${vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0].totalEngineHours} , `;
+          `totalEngineHours = ${vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0].totalEngineHours.toFixed(
+            3
+          )} , `;
       }
 
       // latitude
@@ -86,18 +90,22 @@ app.get("/api/telematic", async (req, res) => {
       res.status(200).json({
         status: 200,
         data: {
-          hrTotalVehicleDistance:
-            vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0]
-              .hrTotalVehicleDistance,
-          totalEngineHours:
-            vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0]
-              .totalEngineHours,
+          hour_meter:
+            vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0].hrTotalVehicleDistance.toFixed(
+              3
+            ),
+          oper_hours:
+            vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0].totalEngineHours.toFixed(
+              3
+            ),
           longitude:
-            vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0]
-              .snapshotData.gnssPosition.longitude,
+            vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0].snapshotData.gnssPosition.longitude.toString(),
           latitude:
+            vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0].snapshotData.gnssPosition.latitude.toString(),
+          fuel_used: (
             vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0]
-              .snapshotData.gnssPosition.latitude,
+              .engineTotalFuelUsed / 1000
+          ).toFixed(3),
         },
       });
     } catch (error) {
