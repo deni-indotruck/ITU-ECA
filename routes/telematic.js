@@ -85,18 +85,20 @@ app.get("/api/telematic", async (req, res) => {
 
       res.status(200).json({
         status: 200,
-        hrTotalVehicleDistance:
-          vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0]
-            .hrTotalVehicleDistance,
-        totalEngineHours:
-          vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0]
-            .totalEngineHours,
-        longitude:
-          vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0]
-            .snapshotData.gnssPosition.longitude,
-        latitude:
-          vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0]
-            .snapshotData.gnssPosition.latitude,
+        data: {
+          hrTotalVehicleDistance:
+            vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0]
+              .hrTotalVehicleDistance,
+          totalEngineHours:
+            vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0]
+              .totalEngineHours,
+          longitude:
+            vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0]
+              .snapshotData.gnssPosition.longitude,
+          latitude:
+            vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0]
+              .snapshotData.gnssPosition.latitude,
+        },
       });
     } catch (error) {
       if (error.response.status == 400) {
