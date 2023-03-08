@@ -3,6 +3,13 @@ const app = express.Router();
 const axios = require("axios");
 
 app.get("/api/telematic", async (req, res) => {
+  const apiKey = req.get("apiKey");
+  if (apiKey != process.env.API_KEY) {
+    return res.status(401).json({
+      message: "Anauthorized",
+    });
+  }
+
   const vin = req.query.vin;
   const brand = req.query.brand;
 
