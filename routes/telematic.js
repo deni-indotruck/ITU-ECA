@@ -46,34 +46,34 @@ app.get("/api/telematic", async (req, res) => {
           console.log("successfully connected to renault trucks");
         }
 
-      var stringData = "";
-      // hrTotalVehicleDistance
-      if (
-        !vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0]
-          .hrTotalVehicleDistance
-      ) {
-        stringData = stringData + `hrTotalVehicleDistance = null, `;
-      } else {
-        stringData =
-          stringData +
-          `hrTotalVehicleDistance = ${vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0].hrTotalVehicleDistance.toFixed(
-            3
-          )} , `;
-      }
+        var stringData = "";
+        // hrTotalVehicleDistance
+        if (
+          !vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0]
+            .hrTotalVehicleDistance
+        ) {
+          stringData = stringData + `hrTotalVehicleDistance = null, `;
+        } else {
+          stringData =
+            stringData +
+            `hrTotalVehicleDistance = ${vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0].hrTotalVehicleDistance.toFixed(
+              3
+            )} , `;
+        }
 
-      // totalEngineHours
-      if (
-        !vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0]
-          .totalEngineHours
-      ) {
-        stringData = stringData + `totalEngineHours = null, `;
-      } else {
-        stringData =
-          stringData +
-          `totalEngineHours = ${vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0].totalEngineHours.toFixed(
-            3
-          )} , `;
-      }
+        // totalEngineHours
+        if (
+          !vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0]
+            .totalEngineHours
+        ) {
+          stringData = stringData + `totalEngineHours = null, `;
+        } else {
+          stringData =
+            stringData +
+            `totalEngineHours = ${vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0].totalEngineHours.toFixed(
+              3
+            )} , `;
+        }
 
         // latitude
         if (
@@ -101,28 +101,49 @@ app.get("/api/telematic", async (req, res) => {
 
         console.log(stringData);
 
+        let date_ob = new Date();
+        let date = ("0" + date_ob.getDate()).slice(-2);
+        let month = ("0" + (date_ob.getMonth() + 1)).slice(-2);
+        let year = date_ob.getFullYear();
+        let hours = date_ob.getHours();
+        let minutes = date_ob.getMinutes();
+        let seconds = date_ob.getSeconds();
+        const date_time_now =
+          year +
+          "-" +
+          month +
+          "-" +
+          date +
+          " " +
+          hours +
+          ":" +
+          minutes +
+          ":" +
+          seconds;
 
-      res.status(200).json({
-        status: 200,
-        data: {
-          hour_meter:
-            vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0].hrTotalVehicleDistance.toFixed(
-              3
-            ),
-          oper_hours:
-            vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0].totalEngineHours.toFixed(
-              3
-            ),
-          longitude:
-            vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0].snapshotData.gnssPosition.longitude.toString(),
-          latitude:
-            vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0].snapshotData.gnssPosition.latitude.toString(),
-          fuel_used: (
-            vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0]
-              .engineTotalFuelUsed / 1000
-          ).toFixed(3),
-        },
-      });
+        res.status(200).json({
+          status: 200,
+          data: {
+            hour_meter:
+              vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0].hrTotalVehicleDistance.toFixed(
+                3
+              ),
+            oper_hours:
+              vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0].totalEngineHours.toFixed(
+                3
+              ),
+            longitude:
+              vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0].snapshotData.gnssPosition.longitude.toString(),
+            latitude:
+              vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0].snapshotData.gnssPosition.latitude.toString(),
+            fuel_used: (
+              vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0]
+                .engineTotalFuelUsed / 1000
+            ).toFixed(3),
+            last_update: date_time_now,
+          },
+        });
+      }
     } catch (error) {
       if (error.response.status == 400) {
         console.log("connected to renault truck");
