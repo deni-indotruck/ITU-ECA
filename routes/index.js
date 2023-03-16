@@ -1843,6 +1843,10 @@ app.post("/api/iphone", async (req, res) => {
           useFindAndModify: true,
         }
       ).exec();
+      console.log({
+        downloads: update_download_iphone,
+        last_data_downloads: last_data,
+      });
       const cekIphone = await IphoneModel.find();
       res.status(200).json(cekIphone);
     } else {
