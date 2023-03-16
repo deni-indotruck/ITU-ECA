@@ -13,6 +13,9 @@ const importDatatable = require("./config/importDataTables");
 const route = require("./routes/index");
 
 const telematic = require("./routes/telematic");
+const android = require("./routes/android");
+const iphone = require("./routes/iphone");
+const equipment = require("./routes/equipment");
 const imageUpload = require("./routes/imageUpload");
 // const itugp = require("./routes/itu-gp");
 
@@ -36,6 +39,9 @@ app.use([
   importDatatable,
   route,
   telematic,
+  android,
+  iphone,
+  equipment,
   imageUpload,
 ]);
 
