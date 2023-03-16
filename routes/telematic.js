@@ -4,6 +4,13 @@ const app = express.Router();
 const axios = require("axios");
 
 app.get("/api/telematic", async (req, res) => {
+  const apiKey = req.get("apiKEy");
+  if (apiKey != process.env.API_KEY) {
+    return res.status(401).json({
+      message: "Anauthorized",
+    });
+  }
+
   const vin = req.query.vin;
   const brand = req.query.brand;
   const username = req.query.username || "";
@@ -39,30 +46,34 @@ app.get("/api/telematic", async (req, res) => {
           console.log("successfully connected to renault trucks");
         }
 
-        var stringData = "";
-        // hrTotalVehicleDistance
-        if (
-          !vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0]
-            .hrTotalVehicleDistance
-        ) {
-          stringData = stringData + `hrTotalVehicleDistance = null, `;
-        } else {
-          stringData =
-            stringData +
-            `hrTotalVehicleDistance = ${vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0].hrTotalVehicleDistance} , `;
-        }
+      var stringData = "";
+      // hrTotalVehicleDistance
+      if (
+        !vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0]
+          .hrTotalVehicleDistance
+      ) {
+        stringData = stringData + `hrTotalVehicleDistance = null, `;
+      } else {
+        stringData =
+          stringData +
+          `hrTotalVehicleDistance = ${vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0].hrTotalVehicleDistance.toFixed(
+            3
+          )} , `;
+      }
 
-        // totalEngineHours
-        if (
-          !vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0]
-            .totalEngineHours
-        ) {
-          stringData = stringData + `totalEngineHours = null, `;
-        } else {
-          stringData =
-            stringData +
-            `totalEngineHours = ${vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0].totalEngineHours} , `;
-        }
+      // totalEngineHours
+      if (
+        !vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0]
+          .totalEngineHours
+      ) {
+        stringData = stringData + `totalEngineHours = null, `;
+      } else {
+        stringData =
+          stringData +
+          `totalEngineHours = ${vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0].totalEngineHours.toFixed(
+            3
+          )} , `;
+      }
 
         // latitude
         if (
@@ -90,49 +101,56 @@ app.get("/api/telematic", async (req, res) => {
 
         console.log(stringData);
 
-        res.json({
-          hrTotalVehicleDistance:
-            vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0]
-              .hrTotalVehicleDistance,
-          totalEngineHours:
-            vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0]
-              .totalEngineHours,
+
+      res.status(200).json({
+        status: 200,
+        data: {
+          hour_meter:
+            vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0].hrTotalVehicleDistance.toFixed(
+              3
+            ),
+          oper_hours:
+            vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0].totalEngineHours.toFixed(
+              3
+            ),
           longitude:
-            vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0]
-              .snapshotData.gnssPosition.longitude,
+            vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0].snapshotData.gnssPosition.longitude.toString(),
           latitude:
+            vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0].snapshotData.gnssPosition.latitude.toString(),
+          fuel_used: (
             vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0]
-              .snapshotData.gnssPosition.latitude,
-        });
-      }
+              .engineTotalFuelUsed / 1000
+          ).toFixed(3),
+        },
+      });
     } catch (error) {
       if (error.response.status == 400) {
         console.log("connected to renault truck");
-        res.json("vin format wrong!");
+        res.status(400).json("vin format wrong!");
         console.log("vin format wrong!");
       } else if (error.response.status == 500) {
         console.log("connected to renault truck");
-        res.json("username or password wrong!");
+        res.status(500).json("username or password wrong!");
         console.log("username or password wrong!");
       } else if (error.response.status == 429) {
         console.log("can't connected to renault truck");
-        res.json("unable get data, please refresh");
+        res.status(429).json("unable get data, please refresh");
         console.log("unable get data, please refresh");
       } else if (error.response.status == 401) {
         console.log("can't connected to renault truck");
-        res.json("Unauthorized, Credential expired");
+        res.status(401).json("Unauthorized, Credential expired");
         console.log("Unauthorized, Credential expired");
       } else if (error.response.status == 404) {
         console.log("connected to renault truck");
-        res.json("VIN Not Found");
+        res.status(404).json("VIN Not Found");
         console.log("VIN Not Found");
       } else if (error.response.status == 406) {
         console.log("connected to renault truck");
-        res.json("Unsupported Accept Parameter");
+        res.status(406).json("Unsupported Accept Parameter");
         console.log("Unsupported Accept Parameter");
       } else {
         console.log("can not connected to renault truck");
-        res.json(error);
+        res.status(500).json(error);
       }
     }
   }
