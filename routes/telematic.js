@@ -90,6 +90,26 @@ app.get("/api/telematic", async (req, res) => {
 
         console.log(stringData);
 
+        let date_ob = new Date();
+        let date = ("0" + date_ob.getDate()).slice(-2);
+        let month = ("0" + (date_ob.getMonth() + 1)).slice(-2);
+        let year = date_ob.getFullYear();
+        let hours = date_ob.getHours();
+        let minutes = date_ob.getMinutes();
+        let seconds = date_ob.getSeconds();
+        const date_time_now =
+          year +
+          "-" +
+          month +
+          "-" +
+          date +
+          " " +
+          hours +
+          ":" +
+          minutes +
+          ":" +
+          seconds;
+
         res.json({
           hrTotalVehicleDistance:
             vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0]
@@ -103,6 +123,7 @@ app.get("/api/telematic", async (req, res) => {
           latitude:
             vehiclePositions.data.vehicleStatusResponse.vehicleStatuses[0]
               .snapshotData.gnssPosition.latitude,
+          lastUpdate: date_time_now,
         });
       }
     } catch (error) {
