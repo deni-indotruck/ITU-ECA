@@ -1,6 +1,5 @@
 const express = require("express");
 const CredsModel = require("../models/creds");
-const AndroidModel = require("../models/android");
 const app = express.Router();
 const axios = require("axios");
 
