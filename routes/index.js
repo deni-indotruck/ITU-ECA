@@ -7,6 +7,7 @@ const IphoneModel = require("../models/iphone");
 const EquipmentModel = require("../models/equipment");
 const VisitorModel = require("../models/visitor");
 const DatatableModel = require("../models/datatable");
+
 const { application } = require("express");
 const app = express.Router();
 const bodyParser = require("body-parser");
@@ -1945,6 +1946,5 @@ app.post("/api/visitor", async (req, res) => {
     });
   }
 });
-
 
 module.exports = app;
