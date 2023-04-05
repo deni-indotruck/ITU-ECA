@@ -143,16 +143,18 @@ app.post("/api/update_promo", async (req, res) => {
             useFindAndModify: true,
           })
             .then((value) => {
-              res.status(200).json({ message: "Success Update" });
+              res.status(200).json({
+                message: "Update promo success",
+                data: {
+                  image: image,
+                  title: title,
+                  description: description,
+                },
+              });
             })
             .catch((err) => {
               res.status(500).json({ message: err.toString() });
             });
-
-          // res.status(200).json({
-          //   message: "Update promo success",
-          //   data: { image: image, title: title, description: description },
-          // });
         }
       }
     });
