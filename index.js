@@ -11,7 +11,7 @@ const importAlert = require("./config/importAlert");
 const importError = require("./config/importError");
 const importDatatable = require("./config/importDataTables");
 const route = require("./routes/index");
-
+const spec = require("./routes/spec");
 const telematic = require("./routes/telematic");
 const android = require("./routes/android");
 const iphone = require("./routes/iphone");
@@ -43,6 +43,7 @@ app.use([
   iphone,
   equipment,
   imageUpload,
+  spec,
 ]);
 
 const privateKey = fs.readFileSync(
