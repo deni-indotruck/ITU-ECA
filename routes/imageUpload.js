@@ -96,7 +96,7 @@ app.get("/api/promo", async (req, res) => {
   }
 });
 
-app.post("/api/update_promo", async (req, res) => {
+app.put("/api/update_promo", async (req, res) => {
   var id_promo = req.query.id_promo;
 
   if (!id_promo) {
