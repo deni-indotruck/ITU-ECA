@@ -13,22 +13,17 @@ app.get("/api/telematic", async (req, res) => {
 
   const vin = req.query.vin;
   const brand = req.query.brand;
-  const username = req.query.username || "";
-  const password = req.query.password || "";
 
   if (brand == "RENAULT TRUCK") {
     try {
       var account = await CredsModel.findOne({
-        username: username,
-        password: password,
+        serialNumber: vin,
       });
       if (!account) {
         res.status(200).json({
-          message: `Can't Found Account in Database`,
-          data: { username: username, password: password },
+          message: `Can't Found Account in Database with this Serial Number ${vin}`,
         });
       } else {
-        // res.json({ username: account.username, password: account.username });
         const vehiclePositions = await axios.get(
           `https://api.renault-trucks.com/vehicle/vehiclestatuses?vin=${vin}&latestOnly=true`,
           {
@@ -38,7 +33,7 @@ app.get("/api/telematic", async (req, res) => {
             },
             auth: {
               username: account.username,
-              password: password,
+              password: account.password,
             },
           }
         );
