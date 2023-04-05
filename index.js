@@ -11,12 +11,11 @@ const importAlert = require("./config/importAlert");
 const importError = require("./config/importError");
 const importDatatable = require("./config/importDataTables");
 const route = require("./routes/index");
-
+const spec = require("./routes/spec");
 const telematic = require("./routes/telematic");
 
 const morgan = require("morgan");
 const { options, morganOptions } = require("./config/index");
-
 
 const app = express();
 app.use(express.json());
@@ -29,9 +28,7 @@ app.get("/", (req, res) => {
   res.json({ message: "Welcome to ITU-ECA" });
 });
 
-
-app.use([importAlert, importError, importDatatable, route, telematic]);
-
+app.use([importAlert, importError, spec, importDatatable, route, telematic]);
 
 const privateKey = fs.readFileSync(
   path.join(__dirname, "/keys/private.key"),
