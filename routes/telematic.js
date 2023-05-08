@@ -171,37 +171,17 @@ app.get("/api/telematic", async (req, res) => {
       }
     }
   } else if (brand == "KALMAR") {
-    try {
-      var account = await CredsModel.findOne({
-        serialNumber: vin,
+    var account = await CredsModel.findOne({
+      serialNumber: vin,
+    });
+    if (!account) {
+      res.status(200).json({
+        message: `Can't Found Account in Database with this Serial Number ${vin}`,
       });
-      if (!account) {
-        res.status(200).json({
-          message: `Can't Found Account in Database with this Serial Number ${vin}`,
-        });
-      } else {
-        const reqDataTotalEngineHours = await axios.get(
-          `https://kalmarcloudapi.ncic.cargotec.com/engineHours?serialNumber=${vin}`,
-          {
-            headers: {
-              "x-api-key": account.username,
-            },
-          }
-        );
-        if (reqDataTotalEngineHours) {
-          console.log("successfully connected to kalmar Total Engine Hours");
-        }
+    } else {
+      var errorMessage = "";
 
-        var stringData = "";
-        // totalEngineHours
-        if (!reqDataTotalEngineHours.data.dataList[0].totalEngineHours) {
-          stringData = stringData + `hrTotalEngineHours = null, `;
-        } else {
-          stringData =
-            stringData +
-            `hrTotalEngineHours = ${reqDataTotalEngineHours.data.dataList[0].totalEngineHours} , `;
-        }
-
+      try {
         const reqDataLocation = await axios.get(
           `https://kalmarcloudapi.ncic.cargotec.com/position?serialNumber=${vin}`,
           {
@@ -212,24 +192,75 @@ app.get("/api/telematic", async (req, res) => {
         );
         if (reqDataLocation) {
           console.log("successfully connected to Kalmar Location");
+        } else {
+          errorMessage =
+            errorMessage + " can't connect to kalmar total engine hours";
         }
 
         // longitude
         if (!reqDataLocation.data[0].longitude) {
-          stringData = stringData + `hrlongitude = null, `;
+          stringData = stringData + `hrlongitude = 0, `;
+          var longitude = 0;
         } else {
           stringData =
             stringData +
             `hrlongitude = ${reqDataLocation.data[0].longitude} , `;
+          var longitude = reqDataLocation.data[0].longitude.toString();
         }
         // latitude
         if (!reqDataLocation.data[0].latitude) {
-          stringData = stringData + `hrlatitude = null, `;
+          stringData = stringData + `hrlatitude = 0, `;
+          var latitude = 0;
         } else {
           stringData =
             stringData + `hrlatitude = ${reqDataLocation.data[0].latitude} , `;
+          var latitude = reqDataLocation.data[0].latitude.toString();
+        }
+      } catch (error) {
+        errorMessage =
+          errorMessage + " can't connect to kalmar total engine hours";
+        stringData = stringData + `hrlongitude = 0, `;
+        var longitude = 0;
+        stringData = stringData + `hrlatitude = 0, `;
+        var latitude = 0;
+      }
+
+      try {
+        const reqDataTotalEngineHours = await axios.get(
+          `https://kalmarcloudapi.ncic.cargotec.com/engineHours?serialNumber=${vin}`,
+          {
+            headers: {
+              "x-api-key": account.username,
+            },
+          }
+        );
+        if (reqDataTotalEngineHours) {
+          console.log("successfully connected to kalmar Total Engine Hours");
+        } else {
+          errorMessage =
+            errorMessage + " can't connect to kalmar total engine hours";
         }
 
+        var stringData = "";
+        // totalEngineHours
+        if (!reqDataTotalEngineHours.data.dataList[0].totalEngineHours) {
+          stringData = stringData + `hrTotalEngineHours = 0, `;
+          var totalEngineHours = 0;
+        } else {
+          stringData =
+            stringData +
+            `hrTotalEngineHours = ${reqDataTotalEngineHours.data.dataList[0].totalEngineHours} , `;
+          var totalEngineHours =
+            reqDataTotalEngineHours.data.dataList[0].totalEngineHours;
+        }
+      } catch (error) {
+        errorMessage =
+          errorMessage + " can't connect to kalmar total engine hours";
+        stringData = stringData + `hrTotalEngineHours = 0, `;
+        var totalEngineHours = 0;
+      }
+
+      try {
         const reqDataOperHours = await axios.get(
           `https://kalmarcloudapi.ncic.cargotec.com/fuelAndEnergyConsumption?serialNumber=${vin}`,
           {
@@ -240,83 +271,62 @@ app.get("/api/telematic", async (req, res) => {
         );
         if (reqDataOperHours) {
           console.log("successfully connected to Kalmar Oper Hours");
+        } else {
+          errorMessage =
+            errorMessage + " can't connect to kalmar total oper hours";
         }
         // totalFuelUsed
         if (!reqDataOperHours.data.dataList[0].totalFuelUsed) {
-          stringData = stringData + `hrtotalFuelUsed = null, `;
+          stringData = stringData + `hrtotalFuelUsed = 0, `;
+          var totalFuelUsed = 0;
         } else {
           stringData =
             stringData +
             `hrtotalFuelUsed = ${reqDataOperHours.data.dataList[0].totalFuelUsed} , `;
+          var totalFuelUsed = (
+            reqDataOperHours.data.dataList[0].totalFuelUsed / 1000
+          ).toFixed(3);
         }
-
-        console.log(stringData);
-
-        let date_ob = new Date();
-        let date = ("0" + date_ob.getDate()).slice(-2);
-        let month = ("0" + (date_ob.getMonth() + 1)).slice(-2);
-        let year = date_ob.getFullYear();
-        let hours = date_ob.getHours();
-        let minutes = date_ob.getMinutes();
-        let seconds = date_ob.getSeconds();
-        const date_time_now =
-          year +
-          "-" +
-          month +
-          "-" +
-          date +
-          " " +
-          hours +
-          ":" +
-          minutes +
-          ":" +
-          seconds;
-
-        res.status(200).json({
-          status: 200,
-          data: {
-            longitude: reqDataLocation.data[0].longitude.toString(),
-            latitude: reqDataLocation.data[0].latitude.toString(),
-            oper_hours:
-              reqDataTotalEngineHours.data.dataList[0].totalEngineHours,
-            fuel_used: (
-              reqDataOperHours.data.dataList[0].totalFuelUsed / 1000
-            ).toFixed(3),
-            last_update: date_time_now,
-          },
-        });
+      } catch (error) {
+        errorMessage =
+          errorMessage + " can't connect to kalmar total oper hours";
+        stringData = stringData + `hrtotalFuelUsed = 0, `;
+        var totalFuelUsed = 0;
       }
-    } catch (error) {
-      console.log("error bre");
-      res.status(200).json(error);
-      // if (error.response.status == 400) {
-      //   console.log("connected to renault truck");
-      //   res.status(400).json("vin format wrong!");
-      //   console.log("vin format wrong!");
-      // } else if (error.response.status == 500) {
-      //   console.log("connected to renault truck");
-      //   res.status(500).json("username or password wrong!");
-      //   console.log("username or password wrong!");
-      // } else if (error.response.status == 429) {
-      //   console.log("can't connected to renault truck");
-      //   res.status(429).json("unable get data, please refresh");
-      //   console.log("unable get data, please refresh");
-      // } else if (error.response.status == 401) {
-      //   console.log("can't connected to renault truck");
-      //   res.status(401).json("Unauthorized, Credential expired");
-      //   console.log("Unauthorized, Credential expired");
-      // } else if (error.response.status == 404) {
-      //   console.log("connected to renault truck");
-      //   res.status(404).json("VIN Not Found");
-      //   console.log("VIN Not Found");
-      // } else if (error.response.status == 406) {
-      //   console.log("connected to renault truck");
-      //   res.status(406).json("Unsupported Accept Parameter");
-      //   console.log("Unsupported Accept Parameter");
-      // } else {
-      //   console.log("can not connected to renault truck");
-      //   res.status(500).json(error);
-      // }
+
+      console.log(stringData);
+
+      let date_ob = new Date();
+      let date = ("0" + date_ob.getDate()).slice(-2);
+      let month = ("0" + (date_ob.getMonth() + 1)).slice(-2);
+      let year = date_ob.getFullYear();
+      let hours = date_ob.getHours();
+      let minutes = date_ob.getMinutes();
+      let seconds = date_ob.getSeconds();
+      const date_time_now =
+        year +
+        "-" +
+        month +
+        "-" +
+        date +
+        " " +
+        hours +
+        ":" +
+        minutes +
+        ":" +
+        seconds;
+
+      res.status(200).json({
+        status: 200,
+        data: {
+          vin: vin,
+          longitude: longitude,
+          latitude: latitude,
+          oper_hours: totalEngineHours,
+          fuel_used: totalFuelUsed,
+          last_update: date_time_now,
+        },
+      });
     }
   }
 });
