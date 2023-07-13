@@ -1,6 +1,8 @@
 const cron = require("node-cron");
 const vtAlert = require("../models/vtAlert");
 const vtEquipment = require("../models/vtEquipment");
+const mongoose = require("mongoose");
+const axios = require("axios");
 const updateVtAlert = cron.schedule("01 00 * * *", async () => {
   try {
     ///code here ///
