@@ -15,6 +15,7 @@ const route = require("./routes/index");
 const telematic = require("./routes/telematic");
 const android = require("./routes/android");
 const iphone = require("./routes/iphone");
+const vtAlert = require("./routes/vtAlert");
 const equipment = require("./routes/equipment");
 const imageUpload = require("./routes/imageUpload");
 // const itugp = require("./routes/itu-gp");
@@ -43,6 +44,7 @@ app.use([
   iphone,
   equipment,
   imageUpload,
+  vtAlert,
 ]);
 
 const privateKey = fs.readFileSync(
